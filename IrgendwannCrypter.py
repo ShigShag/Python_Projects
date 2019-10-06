@@ -1,27 +1,26 @@
 from cryptography.fernet import Fernet
 from tkinter.filedialog import askopenfilename
+import os
 
 
-def main(origin_file):
+def main(origin_file, new_file_name):
     with open(origin_file, "rb")as file:
         origin_file_content = file.read()
     encrypted_text, key = encryption(origin_file_content)
-    pseudo_text = """import os
+    pseudo_text = """from os import startfile, remove, path
 from cryptography.fernet import Fernet
 
 
 def main(key, text_to_decrypt):
-    for x in os.listdir():
-        if x == "untitled.exe":
-            with open(x, "wb")as file:
-                file.write(decryption(text_to_decrypt, key))
-            os.startfile(x)
-            break
-
+    file_name = "Datei.exe"
+    with open(file_name, "wb")as file:
+        file.write(decryption(text_to_decrypt, key))
+    startfile(file_name)
+    
 
 def decryption(text_to_decrypt, key):
     method = Fernet(key)
-    decrypt_text = method.decrypt(text_to_decrypt)
+    decrypt_text = method.decrypt(text_to_decrypt)  
     return decrypt_text
 
 
@@ -29,8 +28,10 @@ key = {}
 text_to_decrypt = {}
 main(key, text_to_decrypt)
 """.format(key, encrypted_text)
-    with open("Stub.py", "w")as n:
+    with open(new_file_name, "w")as n:
         n.write(pseudo_text)
+    os.system(f"Pyinstaller -F -w {new_file_name}")
+    os.remove(new_file_name)
 
 
 def encryption(origin_file_content):
@@ -42,4 +43,6 @@ def encryption(origin_file_content):
 
 if __name__ == '__main__':
     f = askopenfilename()
-    main(f)
+    new_file_name = input("Name of new File(without .py): ")
+    new_file_name += ".py"
+    main(f, new_file_name)
