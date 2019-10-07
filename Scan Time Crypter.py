@@ -1,5 +1,5 @@
 from cryptography.fernet import Fernet
-from tkinter.filedialog import askopenfilename
+from tkinter import filedialog
 import os
 
 
@@ -40,12 +40,12 @@ def encryption(origin_file_content):
 
 
 if __name__ == '__main__':
-    f = askopenfilename()
+    f = filedialog.askopenfilename(filetypes=(("exe files", "*.exe"), ("all files", "*.*")))
     new_file_name = input("Name of new File(without .py): ")
     new_file_name += ".py"
     icon_input = input("Custom Icon(.ico)(Y/N): ")
     if icon_input == "Y" or icon_input == "y":
-        icon = askopenfilename()
+        icon = filedialog.askopenfilename(filetypes=(("ico files", "*.ico"), ("all files", "*.*")))
     else:
         icon = None
     main(f, new_file_name, icon)
