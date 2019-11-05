@@ -1,4 +1,5 @@
 from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
 from tkinter.filedialog import askopenfilename
@@ -19,9 +20,11 @@ def main(argv, default_key):
         else:
             path_to_file = askopenfilename()
         if "-key" in argv:
-            key_to_crypt = argv[argv.index("-key") + 1]
-            if type(key_to_crypt) != bytes:
-                key_to_crypt = b'\xfc\x9d\xcd\xe8%\xd5\xebkV\\I\xf8\xb1w]\xf5@\x98\x82!vW\x17\xad\x17\x82\x02p\xacl\xa9\x1f'    #Programm akzepiert nicht eingegebenen Schlüssel, sondern nur den der Hinterlegt ist
+            key_to_crypt = default_key
+
+            #if type(key_to_crypt) != bytes:
+                #key_to_crypt = bytes(key_to_crypt, encoding='utf8')
+            print(key_to_crypt)
         else:
             key_to_crypt = default_key
         encrypt(key_to_crypt, path_to_file)
@@ -64,6 +67,17 @@ def decrypt(key, path):
         f.write(original_date)
 
 
+def keygen(user_password):
+    salt = b':2}\xd7\xe7\xd4n\x1d\tH#y\xc0V|\x93\x17\x92\xa9AqC\x96\x1f\xa4j\x18\xf9+^\xde$'
+    return PBKDF2(user_password, salt, dkLen=32), salt
+
+
 if __name__ == '__main__':
+    key, salt = keygen(input("Password eingeben: "))
     while main(argv[1:], key):
         pass
+    
+    
+    
+#Custom Salt in die Datei schreiben 
+#Weiter machen mit programm generell
