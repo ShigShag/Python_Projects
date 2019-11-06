@@ -68,7 +68,11 @@ def decrypt(user_password, path):
         ciphered_data = f.read()
     key = PBKDF2(user_password, salt, dkLen=32)
     cipher = AES.new(key, AES.MODE_CBC, iv=iv)
-    original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
+    try:
+        original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
+    except ValueError:
+        print("ERROR")
+        quit()
     with open(path, "wb")as f:
         f.write(original_date)
 
@@ -82,5 +86,5 @@ if __name__ == '__main__':
     while main(argv[1:]):
         pass
 
-# Custom Salt in die Datei schreiben
+
 # Weiter machen mit programm generell
