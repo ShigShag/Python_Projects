@@ -4,61 +4,62 @@ from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
 from tkinter.filedialog import askopenfilename
 from sys import argv
-key = b'\xfc\x9d\xcd\xe8%\xd5\xebkV\\I\xf8\xb1w]\xf5@\x98\x82!vW\x17\xad\x17\x82\x02p\xacl\xa9\x1f'
+
+d_key = b'\xfc\x9d\xcd\xe8%\xd5\xebkV\\I\xf8\xb1w]\xf5@\x98\x82!vW\x17\xad\x17\x82\x02p\xacl\xa9\x1f'
+d_salt = b"\xf0\x10\xfbg\xee\xc5?\x19\xed\x0c'f>\xc3\xe2a\xe1\xe4\x19(\xcb\x0cs*q\x9fN\xbb8\xdb\xc2H"
 
 
-def main(argv, default_key):
+def main(argv, default_key, default_salt):
     if "-help" in argv:
-        print("-c\t\tcrypt\n-d\t\tdecypt\n-key []\t\tkey to crypt/decrypt\n-path []\tpath to file to crypt/decrypt | if not given will ask you to choose file\n-help\t\tshows this list")
+        print(
+            "-c\t\tcrypt\n-d\t\tdecypt\n-key []\t\tkey to crypt/decrypt\n-path []\tpath to file to crypt/decrypt | if not given will ask you to choose file\n-p\t\tcustom_password used for encryption and decryption\n-help\t\tshows this list")
         quit()
+
     if "-c" in argv and "-d" in argv:
         print("Only one argument of -c and -d expected\ntype -help to show list of commands")
         quit()
+
+    if "-p" in argv:
+        default_key, default_salt = keygen(argv.index("-p") + 1)
+        print(default_key, default_salt)
+
     if "-c" in argv:
         if "-path" in argv:
             path_to_file = argv[argv.index("-path") + 1]
         else:
             path_to_file = askopenfilename()
-        if "-key" in argv:
-            key_to_crypt = default_key
-
-            #if type(key_to_crypt) != bytes:
-                #key_to_crypt = bytes(key_to_crypt, encoding='utf8')
-            print(key_to_crypt)
-        else:
-            key_to_crypt = default_key
-        encrypt(key_to_crypt, path_to_file)
+        try:
+            encrypt(default_key, default_salt, path_to_file)
+        except FileNotFoundError:
+            quit()
         return False
     elif "-d" in argv:
         if "-path" in argv:
             path_to_file = argv[argv.index("-path") + 1]
         else:
             path_to_file = askopenfilename()
-        if "-key" in argv:
-            key_to_crypt = argv[argv.index("-key") + 1]
-            if type(key_to_crypt) != bytes:
-                key_to_crypt = bytes(key_to_crypt)
-        else:
-            key_to_crypt = default_key
-        decrypt(key_to_crypt, path_to_file)
+
+        decrypt(default_key, default_salt, path_to_file)
         return False
     else:
         print("-c or -d argument required\ntype -help to show list of commands")
         quit()
 
 
-def encrypt(key, path):
+def encrypt(key, salt, path):
     with open(path, "rb")as f:
         msg = f.read()
     cipher = AES.new(key, AES.MODE_CBC)
     encrypted_message = cipher.encrypt(pad(msg, AES.block_size))
     with open(path, "wb")as f:
+        f.write(salt)       #CHECK
         f.write(cipher.iv)
         f.write(encrypted_message)
 
 
-def decrypt(key, path):
+def decrypt(key, salt, path):
     with open(path, "rb")as f:
+        salt = f.read(32)
         iv = f.read(16)
         ciphered_data = f.read()
     cipher = AES.new(key, AES.MODE_CBC, iv=iv)
@@ -73,11 +74,8 @@ def keygen(user_password):
 
 
 if __name__ == '__main__':
-    key, salt = keygen(input("Password eingeben: "))
-    while main(argv[1:], key):
+    while main(argv[1:], d_key, d_salt):
         pass
-    
-    
-    
-#Custom Salt in die Datei schreiben 
-#Weiter machen mit programm generell
+
+# Custom Salt in die Datei schreiben
+# Weiter machen mit programm generell
