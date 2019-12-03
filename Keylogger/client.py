@@ -1,14 +1,26 @@
 import socket
+from pickle import loads
 
 HEADERSIZE = 10
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("192.168.178.22", 1236))
+#s.connect(("192.168.178.22", 1250))
+while True:
+    try:
+        s.connect((socket.gethostname(), 1251))
+        break
+    except ConnectionRefusedError:
+        continue
 
 while True:
-    msgr = ''
-    new_msg = True
+    data = b''
     while True:
-        msg = s.recv(16)
-        print(msg.decode())
+        data_stream = s.recv(1)
+        if not data_stream:
+            break
+        data += data_stream
+    data = loads(data)
+    print(data_stream)
+
+
 

