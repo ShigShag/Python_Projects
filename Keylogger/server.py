@@ -1,17 +1,40 @@
 import socket
+import pickle
 
-HEADERSIZE = 10
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((socket.gethostname(), 1234))
-s.listen()
+class Socket:
 
+    def __init__(self):
+        socket.timeout(5)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind((socket.gethostname(), 50000))
+        print("Listening...")
+        try:
+            self.socket.listen(1)
+            self.connection, self.address = self.socket.accept()
+            Global.connection_established = True
+        except socket.timeout:
+            Global.connection_established = False
+
+
+class Global:
+    connection_established = False
+
+
+connection = Socket()
+print(f"Conncted to {connection.address}")
 while True:
-    client_socket, address = s.accept()
-    print(f"Connection from {address} has been established")
+    while True:
+        if Global.connection_established:
+            while Global.connection_established:
+                data_rec = connection.connection.recv(1024)
+                if not data_rec:
+                    print("not received")
+                    break
+                data_rec = pickle.loads(data_rec)
+                print(data_rec)
 
-    msg = "Welcome to the server"
-    msg = f"{len(msg):<{HEADERSIZE}}" + msg
 
-    client_socket.send(bytes("Welcome to the server!", "utf-8"))
-    client_socket.close()
+#Wenn Server zu erst Startet received er NUR data wenn man key drückt
+#Wenn Server nicht zu erst startet receivet er permanent data nach array
+#Er wartet also nicht beim data_rec, sondern erhät permanent: b''
