@@ -13,4 +13,4 @@ while True:
 
 while True:
     my_socket.send(pickle.dumps(char))
-    input("Press Enter")#+r234e
+    input("Press Enter")#+r234ekjihnubl
