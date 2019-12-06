@@ -31,8 +31,7 @@ while True:
                 if not data_rec:
                     break
                 data_rec = pickle.loads(data_rec)
-                print(data_rec )
-                print("\n\n")
+                print(data_rec)
 
 
 #Wenn Server zu erst Startet received er NUR data wenn man key drückt
