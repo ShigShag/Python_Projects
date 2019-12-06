@@ -27,13 +27,15 @@ while True:
     while True:
         if Global.connection_established:
             while Global.connection_established:
-                data_rec = connection.connection.recv(2048)
+                try:
+                    data_rec = connection.connection.recv(2048)
+                except ConnectionResetError:
+                    print(f"Lost Connection to {connection.address}")
+                    Global.connection_established = False
+                    break
                 if not data_rec:
                     break
                 data_rec = pickle.loads(data_rec)
                 print(data_rec)
 
-
-#Wenn Server zu erst Startet received er NUR data wenn man key drückt
-#Wenn Server nicht zu erst startet receivet er permanent data nach array
-#Er wartet also nicht beim data_rec, sondern erhät permanent: b''
+#Neu listen wenn client Verbindung unterbochen hat

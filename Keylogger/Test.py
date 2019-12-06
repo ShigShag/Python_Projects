@@ -43,7 +43,7 @@ while True:
             f.join()
 
 
-my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #my_socket.connect((socket.gethostname(), 50000))
 with Listener(on_press=no_safe_key_press)as f:
     f.join()
