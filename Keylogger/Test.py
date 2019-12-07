@@ -1,3 +1,6 @@
-import datetime
-x = datetime.datetime.now()
-print(datetime.datetime.now())
+file = open("l.txt", "r")
+
+#file.write("wasd")
+x = file.read()
+print(x)
+file.close()

