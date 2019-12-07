@@ -15,15 +15,14 @@ class Socket:
 
     def __init__(self):
         self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.active_socket.settimeout(1)
 
     def connect_to_server(self):
         try:
+            self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.active_socket.connect(("192.168.178.22", 50000))
             Socket.connection = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
-            self.active_socket.close()
             Socket.connection = False
             print("No connection established!")
 

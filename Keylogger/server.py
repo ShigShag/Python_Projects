@@ -9,7 +9,7 @@ class Socket:
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind(("192.168.178.22", 50000))
+        self.socket.bind((socket.gethostname(), 50000))
         self.listen_to_for_client()
 
     def listen_to_for_client(self):
@@ -82,6 +82,7 @@ while True:
             print(data_rec)
 
 
+#Client verbindet sich nicht mehr wenn man server neustartet
 #Log File formatten mit permanent shift
 #Große arrays richtig verwalten ohne _pickle.UnpicklingError: pickle data was truncated
 #Client sendet nicht wenn er sich des zweite mal verbindet
