@@ -49,6 +49,7 @@ while True:
                     write_to_log_file(char)
             elif type(data_rec) == str:
                 write_to_log_file(data_rec)
+            print(data_rec)
 
 
 #Log File formatten
