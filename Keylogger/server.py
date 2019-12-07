@@ -9,7 +9,7 @@ class Socket:
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((socket.gethostname(), 50000))
+        self.socket.bind(("192.168.178.22", 50000))
         self.listen_to_for_client()
 
     def listen_to_for_client(self):
