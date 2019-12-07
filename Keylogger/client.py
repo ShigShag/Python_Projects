@@ -14,7 +14,7 @@ class Socket:
     connection = False
 
     def __init__(self):
-        self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connect_to_server()
 
     def connect_to_server(self):
         try:
