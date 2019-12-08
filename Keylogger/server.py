@@ -24,6 +24,7 @@ class Socket:
 
 class Global_Variables:
     shift_pressed = False
+    buffer_overflow = False
 
 
 def write_to_log_file(character):
@@ -62,6 +63,7 @@ connection = Socket()
 while True:
     if not Socket.connection_established:
         connection.listen_to_for_client()
+    temp_array = b""
     while True:
         try:
             data_rec = connection.connection.recv(32)
@@ -78,12 +80,13 @@ while True:
                 temp_array = data_rec
                 break
             except pickle.UnpicklingError:
-                temp_array = data_rec
-                data_rec = connection.connection.recv(1024)
+                temp_array += data_rec
+                Global_Variables.buffer_overflow = True
+                continue
 
-
-        data_rec = temp_array
-
+        if Global_Variables.buffer_overflow:
+            data_rec = pickle.loads(temp_array)
+            Global_Variables.buffer_overflow = False
 
         if type(data_rec) == list:
             for char in data_rec:
@@ -93,5 +96,6 @@ while True:
         print(data_rec)
 
 
+#Buffer overflwo weitermachen
 # Log File formatten mit permanent shift
 # Große arrays richtig verwalten ohne _pickle.UnpicklingError: pickle data was truncated
