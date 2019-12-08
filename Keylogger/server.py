@@ -4,7 +4,6 @@ import datetime
 
 
 class Socket:
-
     connection = False
 
     def __init__(self):
@@ -64,25 +63,35 @@ while True:
     if not Socket.connection_established:
         connection.listen_to_for_client()
     while True:
-        if Socket.connection_established:
-            try:
-                data_rec = connection.connection.recv(2048)
-            except ConnectionResetError:
-                print(f"Lost Connection to {connection.address}")
-                Socket.connection_established = False
-                break
+        try:
+            data_rec = connection.connection.recv(32)
             if not data_rec:
                 break
-            data_rec = pickle.loads(data_rec)
-            if type(data_rec) == list:
-                for char in data_rec:
-                    write_to_log_file(char)
-            elif type(data_rec) == str:
-                write_to_log_file(data_rec)
-            print(data_rec)
+        except ConnectionResetError:
+            print(f"Lost Connection to {connection.address}")
+            Socket.connection_established = False
+            break
+
+        while True:
+            try:
+                data_rec = pickle.loads(data_rec)
+                temp_array = data_rec
+                break
+            except pickle.UnpicklingError:
+                temp_array = data_rec
+                data_rec = connection.connection.recv(1024)
 
 
-#Client verbindet sich nicht mehr wenn man server neustartet
-#Log File formatten mit permanent shift
-#Große arrays richtig verwalten ohne _pickle.UnpicklingError: pickle data was truncated
-#Client sendet nicht wenn er sich des zweite mal verbindet
+        data_rec = temp_array
+
+
+        if type(data_rec) == list:
+            for char in data_rec:
+                write_to_log_file(char)
+        elif type(data_rec) == str:
+            write_to_log_file(data_rec)
+        print(data_rec)
+
+
+# Log File formatten mit permanent shift
+# Große arrays richtig verwalten ohne _pickle.UnpicklingError: pickle data was truncated
