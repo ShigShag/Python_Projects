@@ -3,6 +3,7 @@ import pickle
 import datetime
 
 
+
 class Socket:
     connection = False
 
@@ -63,10 +64,14 @@ connection = Socket()
 while True:
     if not Socket.connection_established:
         connection.listen_to_for_client()
-    temp_array = b""
+    full_msg = b""
+    new_msg = True
     while True:
         try:
-            data_rec = connection.connection.recv(32)
+            data_rec = connection.connection.recv(16)
+            if new_msg:
+                msg_len = int(data_rec[:10])
+                new_msg = False
             if not data_rec:
                 break
         except ConnectionResetError:
@@ -74,28 +79,17 @@ while True:
             Socket.connection_established = False
             break
 
-        while True:
-            try:
-                data_rec = pickle.loads(data_rec)
-                temp_array = data_rec
-                break
-            except pickle.UnpicklingError:
-                temp_array += data_rec
-                Global_Variables.buffer_overflow = True
-                continue
-
-        if Global_Variables.buffer_overflow:
-            data_rec = pickle.loads(temp_array)
-            Global_Variables.buffer_overflow = False
-
-        if type(data_rec) == list:
-            for char in data_rec:
-                write_to_log_file(char)
-        elif type(data_rec) == str:
-            write_to_log_file(data_rec)
-        print(data_rec)
+        full_msg += data_rec
+        if len(full_msg) - 10 == msg_len:
+            full_msg = pickle.loads(full_msg[10:])
+            print(full_msg)
+            if type(full_msg) == list:
+                for char in full_msg:
+                    write_to_log_file(char)
+            elif type(full_msg) == str:
+                write_to_log_file(full_msg)
+            full_msg = b''
+            new_msg = True
 
 
-#Buffer overflwo weitermachen
 # Log File formatten mit permanent shift
-# Große arrays richtig verwalten ohne _pickle.UnpicklingError: pickle data was truncated

