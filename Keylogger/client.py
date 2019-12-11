@@ -3,6 +3,7 @@ import socket
 from pickle import dumps
 Header = 10
 
+
 class Global:
     key_array = []
     i = 0
