@@ -3,24 +3,24 @@ from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
 from tkinter.filedialog import askopenfilename
-from sys import argv
+from sys import argv, exit
 
 
 def main(argv):
     if "-help" in argv:
         print("-c\t\tcrypt\n-d\t\tdecypt\n-path []\tpath to file to crypt/decrypt | if not given will ask you to choose file\n-p\t\tcustom_password required for encryption and decryption\n-help\t\tshows this list")
-        quit()
+        exit()
 
     if "-c" in argv and "-d" in argv:
         print("Only one argument of -c and -d expected\ntype -help to show list of commands")
-        quit()
+        exit()
 
     if "-p" in argv:
         default_key, default_salt = keygen(argv[argv.index("-p") + 1])
         user_password = argv[argv.index("-p") + 1]
     else:
         print("ERROR: No password given")
-        quit()
+        exit()
 
     if "-c" in argv:
         if "-path" in argv:
@@ -31,7 +31,7 @@ def main(argv):
             encrypt(default_key, default_salt, path_to_file)
         except FileNotFoundError:
             print("EROOR: FILE NOT FOUND")
-            quit()
+            exit()
         return False
 
     elif "-d" in argv:
@@ -43,11 +43,11 @@ def main(argv):
             decrypt(user_password, path_to_file)
         except FileNotFoundError:
             print("EROOR: FILE NOT FOUND")
-            quit()
+            exit()
         return False
     else:
         print("-c or -d argument required\ntype -help to show list of commands")
-        quit()
+        exit()
 
 
 def encrypt(key, salt, path):
@@ -72,7 +72,7 @@ def decrypt(user_password, path):
         original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
     except ValueError:
         print("ERROR")
-        quit()
+        exit()
     with open(path, "wb")as f:
         f.write(original_date)
 
