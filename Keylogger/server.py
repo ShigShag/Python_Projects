@@ -70,12 +70,10 @@ while True:
     new_msg = True
     while True:
         try:
-            data_rec = connection.connection.recv(16)
+            data_rec = connection.connection.recv(1024)
             if new_msg:
                 msg_len = int(data_rec[:header])
                 new_msg = False
-            if not data_rec:
-                break
         except ConnectionResetError:
             print(f"Lost Connection to {connection.address}")
             Socket.connection_established = False
@@ -88,7 +86,7 @@ while True:
             if type(full_msg) == list:
                 for char in full_msg:
                     write_to_log_file(char)
-            elif type(full_msg) == str:
+            if type(full_msg) == str:
                 write_to_log_file(full_msg)
             full_msg = b''
             new_msg = True
