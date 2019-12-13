@@ -2,6 +2,8 @@ import socket
 import pickle
 import datetime
 
+header = 10
+
 
 class Socket:
     connection = False
@@ -70,7 +72,7 @@ while True:
         try:
             data_rec = connection.connection.recv(16)
             if new_msg:
-                msg_len = int(data_rec[:10])
+                msg_len = int(data_rec[:header])
                 new_msg = False
             if not data_rec:
                 break
@@ -80,8 +82,8 @@ while True:
             break
 
         full_msg += data_rec
-        if len(full_msg) - 10 == msg_len:
-            full_msg = pickle.loads(full_msg[10:])
+        if len(full_msg) - header == msg_len:
+            full_msg = pickle.loads(full_msg[header:])
             print(full_msg)
             if type(full_msg) == list:
                 for char in full_msg:
