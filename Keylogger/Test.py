@@ -1,9 +1,6 @@
+x = []
+for i in range(0, 100):
+    x.append(i)
 
-
-class Constructor:
-
-    def __init__(self):
-
-
-
-client = Constructor()
+with open("wasd.txt", "a+")as f:
+    f.write(x)

