@@ -92,3 +92,4 @@ while True:
             new_msg = True
 
 # Global IP
+# Umstellen auf nur array receive
