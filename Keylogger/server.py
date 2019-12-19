@@ -84,7 +84,7 @@ while True:
             full_msg = pickle.loads(full_msg[header:])
             print(full_msg)
             if type(full_msg) == list:
-                for char in full_msg[:10]:
+                for char in full_msg:
                     write_to_log_file(char)
             if type(full_msg) == str:
                 write_to_log_file(full_msg)
