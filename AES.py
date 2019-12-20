@@ -78,8 +78,9 @@ def decrypt(user_password, path):
 
 
 def keygen(user_password):
+    random_string = "mucj9058tu9q083ut09q53ut905uz8t07z5238790t5h23807t235th9235h8x95,mh589th82ht785fmc3jh2t"
     salt = get_random_bytes(32)
-    return PBKDF2(user_password, salt, dkLen=32), salt
+    return PBKDF2(user_password + random_string, salt, dkLen=32), salt
 
 
 if __name__ == '__main__':
