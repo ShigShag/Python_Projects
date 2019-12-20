@@ -6,6 +6,7 @@ header = 10
 
 
 class Socket:
+
     connection = False
 
     def __init__(self):
@@ -66,7 +67,7 @@ connection = Socket()
 while True:
     if not Socket.connection_established:
         connection.listen_to_for_client()
-    full_msg = b""
+    full_msg = b''
     new_msg = True
     while True:
         try:
