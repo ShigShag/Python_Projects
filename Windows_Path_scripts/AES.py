@@ -75,7 +75,7 @@ def decrypt(user_password, path):
     try:
         original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
     except ValueError:
-        print("ERROR")
+        print("Wrong Password")
         exit()
     with open(path, "wb")as f:
         f.write(original_date)
