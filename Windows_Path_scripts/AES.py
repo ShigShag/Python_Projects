@@ -4,12 +4,12 @@ from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
 from tkinter.filedialog import askopenfilename
 from sys import exit
+from os import path
 
 random_string = """mucj9058tu9q083ut09q53ut905uz8t07z52387904ztn4zc09g4z907gcn708942zg045zg0ßm04mx70g79ß2j9, 
 87uß92u54ß9g08u5ß420guß054328ug9ßc54ug90743z5g90c 
 ß9x4h9gh9nß45hg9ß543hmg9043hcgß943h9ß07h0m4chmg90ß452hg9ßc0m54h9g70ßh3459ßghß45zmß92zg98, hx9h90h9g0h490gh027hß9x 
 ßj23opigjfopig45346465ru978jz2098z9r708z0978zy8zr078z7z30792zrn07z98r7z8972z8972zr987z83497rz8934tr43th943ht9c34htn3ztc387t446gh3iofzi3hi3f934f9039fz34nfz3489fz983zc3891zf8913z897fcz891zcj87f1z8fz1c8jfz143fcz1fz1zf14zfjc1t5h23807t235th9235h8x95,mh589th82ht785fmc3jh2t """
-x = 1
 
 
 def main():
@@ -17,32 +17,32 @@ def main():
     user_input = input("> ")
     if user_input == "1":
         print("Enter Path:")
-        path = input("> ")
-        if not check_file_exists(path):
+        file_path = input("> ")
+        if not path.exists(file_path):
             print("File not found, choose manually")
-            path = askopenfilename()
-            if not check_file_exists(path):
+            file_path = askopenfilename()
+            if not path.exists(file_path):
                 print("File not found")
                 return True
         print("Enter Password to encrypt")
         user_input = input("> ")
         default_key, default_salt = keygen(user_input)
-        encrypt(default_key, default_salt, path)
+        encrypt(default_key, default_salt, file_path)
         print("Encryption finished")
         return True
 
     elif user_input == "2":
         print("Enter Path:")
-        path = input("> ")
-        if not check_file_exists(path):
+        file_path = input("> ")
+        if not path.exists(file_path):
             print("File not found, choose manually")
-            path = askopenfilename()
-            if not check_file_exists(path):
+            file_path = askopenfilename()
+            if not path.exists(file_path):
                 print("File not found")
                 return True
         print("Enter Password to decrypt")
         user_input = input("> ")
-        decrypt(user_input + random_string, path)
+        decrypt(user_input + random_string, file_path)
         print("decryption finished")
         return True
 
@@ -52,14 +52,6 @@ def main():
     else:
         print("wrong command")
         return True
-
-
-def check_file_exists(path):
-    try:
-        open(path, "rb")
-        return True
-    except (FileNotFoundError, PermissionError):
-        return False
 
 
 def encrypt(key, salt, path):
