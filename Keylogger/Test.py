@@ -1,1 +1,2 @@
-print(__file__)
+from tkinter.filedialog import askopenfilename
+x =askopenfilename()
