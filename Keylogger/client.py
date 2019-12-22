@@ -71,7 +71,7 @@ class Socket:
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.active_socket.settimeout(1)
-            self.active_socket.connect((socket.gethostname(), 50000))
+            self.active_socket.connect(("freespeak.de", 50000))
             Socket.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):

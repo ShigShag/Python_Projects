@@ -23,7 +23,8 @@ def decrypt(user_password, path):
     key = PBKDF2(user_password, salt, dkLen=32)
     cipher = AES.new(key, AES.MODE_CBC, iv=iv)
     original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
-    return original_date
+    with open(path, "wb")as f:
+        f.write(original_date)
 
 
 def keygen(user_password):
