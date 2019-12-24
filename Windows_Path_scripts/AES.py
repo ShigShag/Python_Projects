@@ -52,7 +52,7 @@ def main():
             print("decryption failed")
         return True
 
-    elif user_input == "3":
+    elif user_input == "3" or user_input == "exit":
         return False
 
     else:
