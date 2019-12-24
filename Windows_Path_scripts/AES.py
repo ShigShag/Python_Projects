@@ -6,6 +6,7 @@ from tkinter.filedialog import askopenfilename
 from sys import exit
 from os import path
 
+
 random_string = """mucj9058tu9q083ut09q53ut905uz8t07z52387904ztn4zc09g4z907gcn708942zg045zg0ßm04mx70g79ß2j9, 
 87uß92u54ß9g08u5ß420guß054328ug9ßc54ug90743z5g90c 
 ß9x4h9gh9nß45hg9ß543hmg9043hcgß943h9ß07h0m4chmg90ß452hg9ßc0m54h9g70ßh3459ßghß45zmß92zg98, hx9h90h9g0h490gh027hß9x 
@@ -20,6 +21,7 @@ def main():
     if user_input == "1":
         print("Enter Path:")
         file_path = input("> ")
+        file_path = file_path.replace('"', '')
         if not path.exists(file_path):
             print("File not found, choose manually")
             file_path = askopenfilename()
@@ -36,6 +38,7 @@ def main():
     elif user_input == "2":
         print("Enter Path:")
         file_path = input("> ")
+        file_path = file_path.replace('"', '')
         if not path.exists(file_path):
             print("File not found, choose manually")
             file_path = askopenfilename()
