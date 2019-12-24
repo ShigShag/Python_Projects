@@ -3,7 +3,6 @@ from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
 from tkinter.filedialog import askopenfilename
-from sys import exit
 from os import path
 
 
@@ -47,8 +46,10 @@ def main():
                 return True
         print("Enter Password to decrypt")
         user_input = input("> ")
-        decrypt(user_input + random_string, file_path)
-        print("decryption finished")
+        if decrypt(user_input + random_string, file_path):
+            print("decryption finished")
+        else:
+            print("decryption failed")
         return True
 
     elif user_input == "3":
@@ -76,14 +77,19 @@ def decrypt(user_password, path):
         iv = f.read(16)
         ciphered_data = f.read()
     key = PBKDF2(user_password, salt, dkLen=32)
-    cipher = AES.new(key, AES.MODE_CBC, iv=iv)
+    try:
+        cipher = AES.new(key, AES.MODE_CBC, iv=iv)
+    except ValueError:
+        print("Data was not encrypted")
+        return False
     try:
         original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
     except ValueError:
         print("Wrong Password")
-        exit()
+        return False
     with open(path, "wb")as f:
         f.write(original_date)
+    return True
 
 
 def keygen(user_password):
