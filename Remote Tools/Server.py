@@ -23,6 +23,11 @@ class Socket:
     def send_command(self, command):
         command = str(command)
         self.connection.send(command.encode())
+        self.receive_command_output()
+
+    def receive_command_output(self):
+        cmd = self.connection.recv(4096)
+        print(cmd.decode())
 
 
 connection = Socket()
