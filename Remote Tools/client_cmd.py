@@ -13,7 +13,7 @@ class Socket:
     def connect_to_server(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.connect(("ip-95-222-116-98.hsi15.unitymediagroup.de", 50000))
+            self.active_socket.connect(("uhblajkil.cf", 50000))
             Socket.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
