@@ -24,9 +24,8 @@ class Socket:
 
     def send_command(self, command):
         command = command.encode()
-        print(command)
         self.connection.send(command)
-        if not command[0:5] == "batch":
+        if not command.decode()[0:5] == "batch":
             self.receive_command_output()
 
     def receive_command_output(self):
@@ -48,15 +47,9 @@ connection = Socket()
 while True:
     if not connection.established:
         connection.listen_to_for_client()
-    print("[1] console Command\n[2] Batch script")
+    print("Enter command:")
     user_input = input("> ")
-    if user_input == "1":
-        print("Enter command:")
-        user_input = input("> ")
-        connection.send_command(user_input)
-    elif user_input == "2":
-        print("Enter command:")
-        user_input = input("> ")
+    connection.send_command(user_input)
 
 
 # Batch Script machen

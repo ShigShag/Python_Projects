@@ -53,11 +53,12 @@ class Socket:
 def execute_batch_script(script):
     if not script:
         return False
+    script = script.replace("/n", "\n")
     path = getenv("temp") + "\\" + "mat-debug-1692.bat"
     with open(path, "w+")as f:
         f.write(script)
     startfile(path)
-    remove(path)
+    # remove(path)
     return True
 
 
