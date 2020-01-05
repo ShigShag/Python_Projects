@@ -40,7 +40,7 @@ def prime_number():
 
 
 def pot_prime():
-    p = secrets.randbits(5000)
+    p = secrets.randbits(100)
     return p
 
 

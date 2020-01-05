@@ -9,7 +9,7 @@ class Socket:
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((socket.gethostname(), 50000))
+        self.socket.bind((socket.gethostname(), 20000))
         self.listen_to_for_client()
 
     def listen_to_for_client(self):
@@ -23,9 +23,11 @@ class Socket:
             self.established = False
 
     def send_command(self, command):
-        command = str(command)
-        self.connection.send(command.encode())
-        self.receive_command_output()
+        command = command.encode()
+        print(command)
+        self.connection.send(command)
+        if not command[0:5] == "batch":
+            self.receive_command_output()
 
     def receive_command_output(self):
         full_msg = b''
@@ -46,7 +48,12 @@ connection = Socket()
 while True:
     if not connection.established:
         connection.listen_to_for_client()
-    print("Enter command:")
+    print("[1] console Command\n[2] Batch script")
     user_input = input("> ")
-    connection.send_command(user_input)
-
+    if user_input == "1":
+        print("Enter command:")
+        user_input = input("> ")
+        connection.send_command(user_input)
+    elif user_input == "2":
+        print("Enter command:")
+        user_input = input("> ")
