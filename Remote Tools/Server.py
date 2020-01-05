@@ -57,3 +57,6 @@ while True:
     elif user_input == "2":
         print("Enter command:")
         user_input = input("> ")
+
+
+# Batch Script machen
