@@ -24,7 +24,12 @@ class Socket:
 
     def send_command(self, command):
         command = command.encode()
-        self.connection.send(command)
+        try:
+            self.connection.send(command)
+        except ConnectionResetError:
+            self.established = False
+            print(f"Lost connection to {self.address}")
+            return False
         if not command.decode()[0:5] == "batch":
             self.receive_command_output()
 
@@ -52,4 +57,3 @@ while True:
     connection.send_command(user_input)
 
 
-# Batch Script machen
