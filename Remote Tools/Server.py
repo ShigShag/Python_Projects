@@ -9,7 +9,7 @@ class Socket:
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((socket.gethostname(), 20000))
+        self.socket.bind(("", 20000))
         self.listen_to_for_client()
 
     def listen_to_for_client(self):
@@ -55,5 +55,8 @@ while True:
     print("Enter command:")
     user_input = input("> ")
     connection.send_command(user_input)
+
+
+# uhblajkil.cf
 
 

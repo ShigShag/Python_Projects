@@ -1,3 +1,2 @@
-x = input("")
-x=x.replace("/n", "\n")
-print(x)
+x = "startup"
+print(x[0:7])
