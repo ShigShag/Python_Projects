@@ -38,7 +38,12 @@ class Socket:
         full_msg = b''
         new_msg = True
         while True:
-            msg_rec = self.connection.recv(64)
+            try:
+                msg_rec = self.connection.recv(64)
+            except (ConnectionAbortedError, ConnectionResetError, TimeoutError):
+                self.established = False
+                print(f"Lost connection to {self.address}")
+                return False
             if new_msg:
                 msg_len = int(msg_rec[:self.header])
                 new_msg = False
@@ -63,5 +68,6 @@ while True:
 
 
 # uhblajkil.cf
+# Verbindung fixen
 
 
