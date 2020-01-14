@@ -115,8 +115,10 @@ def main():
         print("Enter Password to encrypt")
         user_input = input("> ")
         default_key, default_salt = keygen(user_input)
-        encrypt(default_key, default_salt, file_path)
-        print("Encryption finished")
+        if encrypt(default_key, default_salt, file_path):
+            print("Encryption finished")
+        else:
+            print("Encryption failed")
         return True
 
     elif user_input == "2":
@@ -146,35 +148,43 @@ def main():
 
 
 def encrypt(key, salt, path):
-    with open(path, "rb")as f:
-        msg = f.read()
-    cipher = AES.new(key, AES.MODE_CBC)
-    encrypted_message = cipher.encrypt(pad(msg, AES.block_size))
-    with open(path, "wb")as f:
-        f.write(salt)
-        f.write(cipher.iv)
-        f.write(encrypted_message)
+    try:
+        with open(path, "rb")as f:
+            msg = f.read()
+        cipher = AES.new(key, AES.MODE_CBC)
+        encrypted_message = cipher.encrypt(pad(msg, AES.block_size))
+        with open(path, "wb")as f:
+            f.write(salt)
+            f.write(cipher.iv)
+            f.write(encrypted_message)
+    except PermissionError:
+        print("Access Denied")
+        return False
 
 
 def decrypt(user_password, path):
-    with open(path, "rb")as f:
-        salt = f.read(32)
-        iv = f.read(16)
-        ciphered_data = f.read()
-    key = PBKDF2(user_password, salt, dkLen=32)
     try:
-        cipher = AES.new(key, AES.MODE_CBC, iv=iv)
-    except ValueError:
-        print("Data was not encrypted")
+        with open(path, "rb")as f:
+            salt = f.read(32)
+            iv = f.read(16)
+            ciphered_data = f.read()
+        key = PBKDF2(user_password, salt, dkLen=32)
+        try:
+            cipher = AES.new(key, AES.MODE_CBC, iv=iv)
+        except ValueError:
+            print("Data was not encrypted")
+            return False
+        try:
+            original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
+        except ValueError:
+            print("Wrong Password")
+            return False
+        with open(path, "wb")as f:
+            f.write(original_date)
+        return True
+    except PermissionError:
+        print("Access Denied")
         return False
-    try:
-        original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
-    except ValueError:
-        print("Wrong Password")
-        return False
-    with open(path, "wb")as f:
-        f.write(original_date)
-    return True
 
 
 def keygen(user_password):
