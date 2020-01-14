@@ -13,6 +13,7 @@ class Socket:
     def connect_to_server(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.active_socket.settimeout(1)
             self.active_socket.connect((socket.gethostname(), 20000))
             Socket.established = True
             print("Connection established")
@@ -23,7 +24,7 @@ class Socket:
     def receive_command(self):
         try:
             cmd = self.active_socket.recv(1024)
-        except (ConnectionResetError, ConnectionRefusedError, TimeoutError, socket.error):
+        except (ConnectionResetError, ConnectionRefusedError, TimeoutError, socket.timeout):
             self.established = False
             return False
 
@@ -64,6 +65,7 @@ class Socket:
             msg = dumps(msg)
             msg = bytes(f"{len(msg):{self.header}}", "utf-8") + msg
             self.active_socket.send(msg)
+            self.established = True
         except(ConnectionResetError, ConnectionAbortedError, OSError):
             self.established = False
 
@@ -116,3 +118,5 @@ while True:
         continue
     while connection.receive_command():
         pass
+
+
