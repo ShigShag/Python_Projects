@@ -146,8 +146,12 @@ def main():
 
 
 def encrypt(key, salt, path):
-    with open(path, "rb")as f:
-        msg = f.read()
+    try:
+        with open(path, "rb")as f:
+            msg = f.read()
+    except PermissionError:
+        print("Access Denied")
+        return False
     cipher = AES.new(key, AES.MODE_CBC)
     encrypted_message = cipher.encrypt(pad(msg, AES.block_size))
     with open(path, "wb")as f:
