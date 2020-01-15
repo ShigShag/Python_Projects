@@ -1,3 +1,2 @@
-from os import chdir, getenv, system
-chdir(getenv("Temp"))
-system("dir")
+from os import system
+system("start explorer")
