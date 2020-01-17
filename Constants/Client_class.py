@@ -2,7 +2,7 @@ from socket import socket, AF_INET, SOCK_STREAM, error
 from pickle import loads, dumps
 
 
-# Client Class
+# Client Class n
 
 
 class Socket:
