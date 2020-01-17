@@ -7,9 +7,9 @@ class Socket:
     header = 10
     established = False
 
-    def __init__(self):
+    def __init__(self, ip_address, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind(("", 20000))
+        self.socket.bind((ip_address, port))
         self.listen_to_for_client()
 
     def listen_to_for_client(self):
@@ -54,7 +54,7 @@ class Socket:
                 return True
 
 
-connection = Socket()
+connection = Socket(socket.gethostname(), 20000)
 print("\nexecute batch: -batch [args] [script(new line = /n)]")
 print("execute file: -e")
 print("startup file -s")

