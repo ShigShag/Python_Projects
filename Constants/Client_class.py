@@ -28,7 +28,7 @@ class Socket:
                 Socket.established = False
                 return False
             else:
-                raise f
+                print("Connection Failed")
 
     # Method to receive Message 
     # Loops until the full message is received and returns it
@@ -50,7 +50,7 @@ class Socket:
                 try:
                     full_msg = loads(full_msg[self.header_size:])
                 except ValueError:
-                    raise ValueError
+                    print("Object could not be loaded")
                 return full_msg
 
     def send_msg(self, msg):
