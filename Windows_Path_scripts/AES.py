@@ -157,6 +157,7 @@ def encrypt(key, salt, path):
             f.write(salt)
             f.write(cipher.iv)
             f.write(encrypted_message)
+        return True
     except PermissionError:
         print("Access Denied")
         return False
