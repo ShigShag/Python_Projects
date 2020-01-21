@@ -1,17 +1,9 @@
-from os import getcwd, chdir
-
-
-def get_parent_path(path):
-    switch = False
-    new_path = ""
-    for char in reversed(path):
-        if char == '\\':
-            switch = True
-        if switch:
-            new_path += char
-    return new_path[::-1]
+from pickle import dumps
+from os import getcwd
 
 print(getcwd())
-print(get_parent_path(getcwd()))
-
-
+path = r"C:\Users\leonw\PycharmProjects\Python_Projects\Remote Tools"
+path2 = f"wasd{getcwd()}"
+path = dumps(path)
+path2 = dumps(path2)
+print()

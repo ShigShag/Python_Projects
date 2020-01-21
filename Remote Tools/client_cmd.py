@@ -65,6 +65,8 @@ class Socket:
 
             elif "cd.." in cmd[0:4]:
                 chdir(self.get_parent_path(getcwd()))
+                path = f"Changed directory to {getcwd()}"
+                self.send_msg(path)
 
             # Normal cmd command stuff
             try:

@@ -39,7 +39,7 @@ class Socket:
         new_msg = True
         while True:
             try:
-                msg_rec = self.connection.recv(64)
+                msg_rec = self.connection.recv(512)
             except (ConnectionAbortedError, ConnectionResetError, TimeoutError):
                 self.established = False
                 print(f"Lost connection to {self.address}")
