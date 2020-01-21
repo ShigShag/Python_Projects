@@ -30,7 +30,7 @@ class Socket:
             self.established = False
             print(f"Lost connection to {self.address}")
             return False
-        if "-batch" in command.decode():
+        if "-batch" in command.decode() or "cd.." in command.decode():
             return
         self.receive_command_output()
 
@@ -39,7 +39,7 @@ class Socket:
         new_msg = True
         while True:
             try:
-                msg_rec = self.connection.recv(512)
+                msg_rec = self.connection.recv(4096)
             except (ConnectionAbortedError, ConnectionResetError, TimeoutError):
                 self.established = False
                 print(f"Lost connection to {self.address}")
