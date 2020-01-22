@@ -157,4 +157,4 @@ while True:
     while connection.established:
         connection.receive_command()
 
-# Endung von runtergeadener Datei
+

