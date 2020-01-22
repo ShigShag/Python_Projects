@@ -45,7 +45,7 @@ class Socket:
         new_msg = True
         while True:
             try:
-                msg_rec = self.connection.recv(4096)
+                msg_rec = self.connection.recv(64)
             except (ConnectionAbortedError, ConnectionResetError, TimeoutError):
                 self.established = False
                 print(f"Lost connection to {self.address}")
@@ -82,7 +82,7 @@ while True:
 
 
 # uhblajkil.cf
-# dir empfangen klappt
+# macnhmal bleibt server stuck beim empfangen vllt richitges Timeout einbauen
 
 
 
