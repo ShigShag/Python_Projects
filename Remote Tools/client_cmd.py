@@ -156,3 +156,5 @@ while True:
         connection.connect_to_server(socket.gethostname(), 20000)
     while connection.established:
         connection.receive_command()
+
+# Endung von runtergeadener Datei
