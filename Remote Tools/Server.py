@@ -82,7 +82,7 @@ while True:
 
 
 # uhblajkil.cf
-
+# dir empfangen klappt
 
 
 
