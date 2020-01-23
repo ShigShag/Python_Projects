@@ -124,7 +124,13 @@ class Socket:
             self.established = False
 
     def ping_response(self):
-        pass
+        msg = dumps(getcwd())
+        msg = bytes(f"{len(msg):{self.header}}", "utf-8") + msg
+        try:
+            self.active_socket.send(msg)
+            self.established = True
+        except(ConnectionResetError, ConnectionAbortedError, OSError):
+            self.established = False
 
     def download_file(self, path):
         try:
