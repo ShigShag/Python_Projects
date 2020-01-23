@@ -123,7 +123,8 @@ class Socket:
         except(ConnectionResetError, ConnectionAbortedError, OSError):
             self.established = False
 
-    def ping_response(self):
+    # Method to send Working directory basically to send something
+    def send_working_directory(self):
         msg = dumps(getcwd())
         msg = bytes(f"{len(msg):{self.header}}", "utf-8") + msg
         try:
