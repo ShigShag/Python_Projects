@@ -1,3 +1,5 @@
-x = "-cdrives C:"
-print(x[9:11])
+from os import chdir, getcwd, getenv
 
+
+chdir("C:\\")
+print(getcwd())

@@ -70,14 +70,17 @@ class Socket:
 
         elif "-cdrive" in cmd:
             for drive in self.get_drives():
+                print(cmd[9:11])
                 if drive == cmd[9:11]:
                     try:
-                        chdir(drive)
+                        chdir(drive + "\\")
                     except (PermissionError, FileNotFoundError)as error:
                         self.send_msg(error)
-                        return
+                        break
                     self.send_msg(getcwd())
                     return
+            self.send_msg(f"Drive: {cmd[9:11]} not found")
+            return
 
         # Change working directory stuff
 
