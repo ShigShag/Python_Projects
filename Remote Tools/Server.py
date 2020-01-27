@@ -65,7 +65,7 @@ class Socket:
                     new_file = open(file_name + "." + file_ending, "wb+")
                     new_file.write(full_msg)
                     new_file.close()
-                return True
+                return full_msg
 
 
 connection = Socket(socket.gethostname(), 20000)
@@ -87,6 +87,7 @@ while True:
 # uhblajkil.cf
 # macnhmal bleibt server stuck beim empfangen vllt richitges Timeout einbauen   ??
 # Multiconnection
+# cdrive geht nicht ganz 
 
 
 

