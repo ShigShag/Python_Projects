@@ -102,7 +102,9 @@ vT&YPUkarbb]5ZbA)45NRMISZDsFxoH7%XZwa&|SHXNjguJEVPGUj&gSpoYat!NtxdKK"!R+Iq6kt (
 def main():
     print("[1] Crypt File\n[2] Hardcore encrypt file\n[3] Decrypt File\n[4] Hardcore decrypt\n[5] Exit")
     user_input = input("> ")
-    # encrypt
+
+    # Encrypt
+
     if user_input == "1":
         print("Enter Path:")
         file_path = input("> ")
@@ -153,6 +155,7 @@ def main():
         return True
 
     # Decrypt
+
     elif user_input == "3":
         print("Enter Path:")
         file_path = input("> ")
@@ -172,6 +175,7 @@ def main():
         return True
 
     # Hardcore decrypt
+
     elif user_input == "4":
         word_cycle_counter = 0
         print("Enter Path:")
