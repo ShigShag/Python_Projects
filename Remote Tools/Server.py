@@ -2,6 +2,7 @@ import socket
 from pickle import loads
 from time import sleep
 
+
 class Socket:
 
     header = 20

