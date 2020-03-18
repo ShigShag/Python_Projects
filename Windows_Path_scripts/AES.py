@@ -100,7 +100,7 @@ vT&YPUkarbb]5ZbA)45NRMISZDsFxoH7%XZwa&|SHXNjguJEVPGUj&gSpoYat!NtxdKK"!R+Iq6kt (
 
 
 def main():
-    print("[1] Crypt File\n[2] Hardcore encrypt file\n[3] Decrypt File\n[4] Hardcore decrypt\n[5] Exit")
+    print("[1] Crypt File\n[2] Hardcore encrypt file\n\n[3] Decrypt File\n[4] Hardcore decrypt\n\n[5] Exit")
     user_input = input("> ")
 
     # Encrypt

