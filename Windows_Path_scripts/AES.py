@@ -212,13 +212,13 @@ def main():
         return True
 
 
-def encrypt(key, salt, path):
+def encrypt(key, salt, file_path):
     try:
-        with open(path, "rb")as f:
+        with open(file_path, "rb")as f:
             msg = f.read()
         cipher = AES.new(key, AES.MODE_CBC)
         encrypted_message = cipher.encrypt(pad(msg, AES.block_size))
-        with open(path, "wb")as f:
+        with open(file_path, "wb")as f:
             f.write(salt)
             f.write(cipher.iv)
             f.write(encrypted_message)
@@ -228,9 +228,9 @@ def encrypt(key, salt, path):
         return False
 
 
-def decrypt(user_password, path):
+def decrypt(user_password, file_path):
     try:
-        with open(path, "rb")as f:
+        with open(file_path, "rb")as f:
             salt = f.read(32)
             iv = f.read(16)
             ciphered_data = f.read()
@@ -245,7 +245,7 @@ def decrypt(user_password, path):
         except ValueError:
             print("Wrong Password")
             return False
-        with open(path, "wb")as f:
+        with open(file_path, "wb")as f:
             f.write(original_date)
         return True
     except PermissionError:
