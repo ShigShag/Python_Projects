@@ -100,7 +100,7 @@ vT&YPUkarbb]5ZbA)45NRMISZDsFxoH7%XZwa&|SHXNjguJEVPGUj&gSpoYat!NtxdKK"!R+Iq6kt (
 
 
 def main():
-    print("[1] Crypt File\n[2] Hardcore encrypt file\n\n[3] Decrypt File\n[4] Hardcore decrypt\n\n[5] Exit")
+    print("[1] Crypt file\n[2] Decrypt file\n\n[3] Hardcore encrypt file\n[4] Hardcore decrypt file\n\n[5] Exit")
     user_input = input("> ")
 
     # Encrypt
@@ -124,9 +124,29 @@ def main():
             print("Encryption failed")
         return True
 
-    # Hardcore encrypt
+    # Decrypt
 
     elif user_input == "2":
+        print("Enter Path:")
+        file_path = input("> ")
+        file_path = file_path.replace('"', '')
+        if not path.exists(file_path):
+            print("File not found, choose manually")
+            file_path = askopenfilename()
+            if not path.exists(file_path):
+                print("File not found")
+                return True
+        print("Enter password to decrypt")
+        user_input = input("> ")
+        if decrypt(user_input + random_string, file_path):
+            print("decryption finished")
+        else:
+            print("decryption failed")
+        return True
+
+    # Hardcore encrypt
+
+    elif user_input == "3":
         letter_counter = 0
         word_cycle_counter = 0
         print("Enter Path:")
@@ -152,26 +172,6 @@ def main():
                 letter_counter = 0
                 continue
         print("Encryption finished")
-        return True
-
-    # Decrypt
-
-    elif user_input == "3":
-        print("Enter Path:")
-        file_path = input("> ")
-        file_path = file_path.replace('"', '')
-        if not path.exists(file_path):
-            print("File not found, choose manually")
-            file_path = askopenfilename()
-            if not path.exists(file_path):
-                print("File not found")
-                return True
-        print("Enter password to decrypt")
-        user_input = input("> ")
-        if decrypt(user_input + random_string, file_path):
-            print("decryption finished")
-        else:
-            print("decryption failed")
         return True
 
     # Hardcore decrypt
@@ -202,6 +202,7 @@ def main():
         print("Decryption finished")
         return True
 
+    # Exit application
 
     elif user_input == "5" or user_input == "exit":
         return False
