@@ -6,11 +6,34 @@ from tkinter.filedialog import askopenfilename
 from os import path
 from sys import exit
 
-cycles = 10
+
+class Settings:
+    # Variables 
+    cycles = 10
+    
+    @staticmethod
+    def change_settings():
+        user_input = ""
+        while user_input != "2" and user_input != "exit":
+            print("[1] Change cycles\n"
+                  "[2] exit")
+            user_input = input("> ")
+
+            if user_input == "1":
+                value_input = input("> ")
+                Settings.cycles = int(value_input)
 
 
 def main():
-    print("[1] Crypt file\n[2] Decrypt file\n\n[3] Hardcore encrypt file\n[4] Hardcore decrypt file\n\n[5] Exit")
+    print("[1] Crypt file\n"
+          "[2] Decrypt file\n"
+          "\n"
+          "[3] Hardcore encrypt file\n"
+          "[4] Hardcore decrypt file\n"
+          "\n"
+          "[5] Settings\n"
+          "[6] Exit")
+
     user_input = input("> ")
 
     # Encrypt
@@ -70,7 +93,7 @@ def main():
                 return True
         print("Enter password to encrypt")
         user_input = input("> ")
-        while word_cycle_counter < cycles:
+        while word_cycle_counter < Settings.cycles:
             try:
                 default_key, default_salt = keygen(user_input[letter_counter])
                 if not encrypt(default_key, default_salt, file_path):
@@ -100,7 +123,7 @@ def main():
         print("Enter password to decrypt")
         user_input = input("> ")
         letter_counter = len(user_input) - 1
-        while word_cycle_counter < cycles:
+        while word_cycle_counter < Settings.cycles:
             if letter_counter >= 0:
                 if not decrypt(user_input[letter_counter] + random_string, file_path):
                     print("Decryption failed")
@@ -112,9 +135,15 @@ def main():
         print("Decryption finished")
         return True
 
+    # Settings
+
+    elif user_input == "5":
+        Settings.change_settings()
+        return True
+
     # Exit application
 
-    elif user_input == "5" or user_input == "exit":
+    elif user_input == "6" or user_input == "exit":
         return False
 
     else:
@@ -185,11 +214,11 @@ def get_string(user_password):
 random_string = ""
 print("Enter Password")
 while not random_string:
-    user_input = input("> ")
-    if user_input == "exit":
+    input_user = input("> ")
+    if input_user == "exit":
         exit()
 
-    random_string = get_string(user_input)
+    random_string = get_string(input_user)
 
 
 while main():
