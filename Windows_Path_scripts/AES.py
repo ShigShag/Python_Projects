@@ -10,18 +10,40 @@ from sys import exit
 class Settings:
     # Variables 
     cycles = 10
+    string_path = r"G:\Python_Projects\Constants\String.txt"
     
     @staticmethod
     def change_settings():
         user_input = ""
-        while user_input != "2" and user_input != "exit":
+        while user_input != "3" and user_input != "exit":
             print("[1] Change cycles\n"
-                  "[2] exit")
+                  "[2] Change password\n"
+                  "[3] Exit settings")
             user_input = input("> ")
 
             if user_input == "1":
                 value_input = input("> ")
                 Settings.cycles = int(value_input)
+
+            if user_input == "2":
+                print("Enter old password")
+                Settings.change_password(input("> "))
+
+    @staticmethod
+    def change_password(old_password):
+        if decrypt(old_password, Settings.string_path):
+            print("Enter new password")
+            new_password = input("> ")
+
+            salt = get_random_bytes(32)
+            new_key = PBKDF2(new_password, salt, dkLen=32)
+            if encrypt(new_key, salt, Settings.string_path):
+                print("Password changed")
+                return True
+            else:
+                return False
+        else:
+            return False
 
 
 def main():
@@ -167,7 +189,8 @@ def encrypt(key, salt, file_path):
         return False
 
 
-def decrypt(user_password, file_path, only_return_content=False):
+def decrypt(user_password, file_path, only_return_content=False, only_return_bool=False):
+    # Open and read file
     try:
         with open(file_path, "rb")as f:
             salt = f.read(32)
@@ -178,24 +201,29 @@ def decrypt(user_password, file_path, only_return_content=False):
         print("Access Denied")
         return False
 
+    # Create new cipher
     try:
         cipher = AES.new(key, AES.MODE_CBC, iv=iv)
     except ValueError:
         print("Data was not encrypted")
         return False
 
+    # Unpad ciphered data
     try:
         original_date = unpad(cipher.decrypt(ciphered_data), AES.block_size)
     except ValueError:
         print("Wrong Password")
         return False
 
-    if not only_return_content:
+    # Return statements
+    if not only_return_content and not only_return_bool:
         with open(file_path, "wb")as f:
             f.write(original_date)
         return True
-    else:
+    elif only_return_content:
         return str(original_date)
+    elif only_return_bool:
+        return True
 
 
 def keygen(user_password):
@@ -204,7 +232,7 @@ def keygen(user_password):
 
 
 def get_string(user_password):
-    string = decrypt(user_password, r"G:\Python_Projects\Constants\String.txt", only_return_content=True)
+    string = decrypt(user_password, Settings.string_path, only_return_content=True)
     if not string:
         return False
     else:
