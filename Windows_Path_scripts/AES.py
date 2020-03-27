@@ -16,7 +16,7 @@ class Settings:
     def change_settings():
         user_input = ""
         while user_input != "3" and user_input != "exit":
-            print("[1] Change cycles\n"
+            print("[1] Change cycles for hardcore encryption\n"
                   "[2] Change password\n"
                   "[3] Exit settings")
             user_input = input("> ")
