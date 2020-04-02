@@ -10,24 +10,41 @@ from sys import exit
 class Settings:
     # Variables 
     cycles = 10
-    string_path = r"G:\Python_Projects\Constants\String.txt"
+    string_path = r"G:\Python_Projects\Constants\String2.txt"
     
     @staticmethod
     def change_settings():
         user_input = ""
-        while user_input != "3" and user_input != "exit":
+        while user_input != "4" and user_input != "exit":
             print("[1] Change cycles for hardcore encryption\n"
                   "[2] Change password\n"
-                  "[3] Exit settings")
+                  "[3] Change string file location\n"
+                  "[4] Exit settings")
             user_input = input("> ")
 
             if user_input == "1":
                 value_input = input("> ")
-                Settings.cycles = int(value_input)
+                try:
+                    Settings.cycles = int(value_input)
+                except ValueError:
+                    pass
 
             if user_input == "2":
                 print("Enter old password")
                 Settings.change_password(input("> "))
+
+            if user_input == "3":
+                print("Enter Path of new file:")
+                file_path = input("> ")
+                file_path = file_path.replace('"', '')
+                if not path.exists(file_path):
+                    print("File not found, choose manually")
+                    file_path = askopenfilename()
+                    if not path.exists(file_path):
+                        print("File not found")
+                        continue
+                Settings.hard_change_string_file_location(file_path)
+                print("Changed path successfully")
 
     @staticmethod
     def change_password(old_password):
@@ -45,7 +62,15 @@ class Settings:
         else:
             return False
 
+    @staticmethod
+    def hard_change_string_file_location(new_string_file_path):
+        with open(__file__, "r")as file:
+            file_content = file.read()
+        file_content = file_content.replace(f'string_path = r"{Settings.string_path}"', f'string_path = r"{new_string_file_path}"')
+        with open(__file__, "w")as file:
+            file.write(file_content)
 
+        
 def main():
     print("[1] Crypt file\n"
           "[2] Decrypt file\n"
@@ -239,8 +264,27 @@ def get_string(user_password):
         return string
 
 
+def check_string_file_location():
+    if not path.exists(Settings.string_path):
+        print("Could not find string file")
+        print("Enter path: ")
+        new_path = input("> ")
+        new_path = new_path.replace('"', '')
+        if not path.exists(new_path):
+            print("File not found, choose manually")
+            new_path = askopenfilename()
+            if not new_path:
+                return False
+        Settings.hard_change_string_file_location(new_path)
+        Settings.string_path = new_path
+    return True
+
+
+# Password
 random_string = ""
-print("Enter Password")
+while not path.exists(Settings.string_path):
+    check_string_file_location()
+print("Enter password")
 while not random_string:
     input_user = input("> ")
     if input_user == "exit":
@@ -248,9 +292,11 @@ while not random_string:
 
     random_string = get_string(input_user)
 
-
+# Main menu
 while main():
     pass
+
+# Update string file after change path
 
 
 
