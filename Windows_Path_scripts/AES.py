@@ -9,17 +9,19 @@ from sys import exit
 
 class Settings:
     # Variables
+    random_string = ""
     cycles = 34
-    string_path = r"G:\Python_Projects\Constants\String2.txt"
+    string_path = r"C:/Users/leonw/OneDrive/Desktop/String2.txt"
 
     @staticmethod
     def change_settings():
         user_input = ""
-        while user_input != "4" and user_input != "exit":
+        while user_input != "5" and user_input != "exit":
             print("[1] Change cycles for hardcore encryption\n"
                   "[2] Change password\n"
                   "[3] Change string file location\n"
-                  "[4] Exit settings")
+                  "[4] Update string\n"
+                  "[5] Exit settings")
             user_input = input("> ")
 
             if user_input == "1":
@@ -46,6 +48,17 @@ class Settings:
                         continue
                 Settings.hard_change_string_file_location(file_path)
                 print("Changed path successfully")
+
+            elif user_input == "4":
+                print("Enter password")
+                temp = ""
+                while not temp:
+                    user_input = input("> ")
+                    if user_input == "exit":
+                        break
+                    temp = get_string(user_input)
+                if temp:
+                    print("String updated")
 
     @staticmethod
     def change_cycles(new_cycles):
@@ -128,7 +141,7 @@ def main():
                 return True
         print("Enter password to decrypt")
         user_input = input("> ")
-        if decrypt(user_input + random_string, file_path):
+        if decrypt(user_input + Settings.random_string, file_path):
             print("decryption finished")
         else:
             print("decryption failed")
@@ -182,7 +195,7 @@ def main():
         letter_counter = len(user_input) - 1
         while word_cycle_counter < Settings.cycles:
             if letter_counter >= 0:
-                if not decrypt(user_input[letter_counter] + random_string, file_path):
+                if not decrypt(user_input[letter_counter] + Settings.random_string, file_path):
                     print("Decryption failed")
                     return True
                 letter_counter -= 1
@@ -263,7 +276,7 @@ def decrypt(user_password, file_path, only_return_content=False, only_return_boo
 
 def keygen(user_password):
     salt = get_random_bytes(32)
-    return PBKDF2(user_password + random_string, salt, dkLen=32), salt
+    return PBKDF2(user_password + Settings.random_string, salt, dkLen=32), salt
 
 
 def get_string(user_password):
@@ -291,16 +304,15 @@ def check_string_file_location():
 
 
 # Password
-random_string = ""
 while not path.exists(Settings.string_path):
     check_string_file_location()
 print("Enter password")
-while not random_string:
+while not Settings.random_string:
     input_user = input("> ")
     if input_user == "exit":
         exit()
 
-    random_string = get_string(input_user)
+    Settings.random_string = get_string(input_user)
 
 # Main menu
 while main():
