@@ -8,10 +8,10 @@ from sys import exit
 
 
 class Settings:
-    # Variables 
-    cycles = 10
+    # Variables
+    cycles = 34
     string_path = r"G:\Python_Projects\Constants\String2.txt"
-    
+
     @staticmethod
     def change_settings():
         user_input = ""
@@ -25,15 +25,16 @@ class Settings:
             if user_input == "1":
                 value_input = input("> ")
                 try:
-                    Settings.cycles = int(value_input)
+                    Settings.change_cycles(int(value_input))
+                    print(f"Cycles changed to {value_input}")
                 except ValueError:
-                    pass
+                    print("Integer required")
 
-            if user_input == "2":
+            elif user_input == "2":
                 print("Enter old password")
                 Settings.change_password(input("> "))
 
-            if user_input == "3":
+            elif user_input == "3":
                 print("Enter Path of new file:")
                 file_path = input("> ")
                 file_path = file_path.replace('"', '')
@@ -45,6 +46,15 @@ class Settings:
                         continue
                 Settings.hard_change_string_file_location(file_path)
                 print("Changed path successfully")
+
+    @staticmethod
+    def change_cycles(new_cycles):
+        with open(__file__, "r")as file:
+            file_content = file.read()
+        file_content = file_content.replace(f'cycles = {Settings.cycles}', f'cycles = {new_cycles}')
+        with open(__file__, "w")as file:
+            file.write(file_content)
+        Settings.cycles = new_cycles
 
     @staticmethod
     def change_password(old_password):
