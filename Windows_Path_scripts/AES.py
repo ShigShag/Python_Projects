@@ -72,6 +72,7 @@ class Settings:
     @staticmethod
     def change_password(old_password):
         if decrypt(old_password, Settings.string_path):
+            
             print("Enter new password")
             new_password = input("> ")
 
@@ -314,11 +315,10 @@ while not Settings.random_string:
 
     Settings.random_string = get_string(input_user)
 
-# Main menu
+# Main loop
 while main():
     pass
 
-# Update string file after change path
 
 
 
