@@ -11,7 +11,7 @@ class Settings:
     # Variables
     random_string = ""
     cycles = 34
-    string_path = r"C:/Users/leonw/OneDrive/Desktop/String2.txt"
+    string_path = r"G:/Python_Projects/Constants/String2.txt"
 
     @staticmethod
     def change_settings():
@@ -318,7 +318,6 @@ while not Settings.random_string:
 # Main loop
 while main():
     pass
-
 
 
 
