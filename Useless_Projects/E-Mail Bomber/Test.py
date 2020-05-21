@@ -14,13 +14,19 @@ class Bomber:
         self.counter = 0
         self.driver.implicitly_wait(20)
 
-    def read_csv_file(self, delay=0, show_counter=0):
+    def read_csv_file(self, delay=0, show_counter=1):
         with open("specs.csv", "r")as csv_file:
             content = csv.reader(csv_file)
             next(content)
             for entry in content:
-                self.call(entry[0], name=entry[1], class_c=entry[2], id=entry[3], show_counter=show_counter)
+                try:
+                    self.call(entry[0], name=entry[1], class_c=entry[2], id=entry[3], show_counter=show_counter)
+                except:
+                    print("Skipped element!! {}".format(self.counter + 1))
+                    self.counter += 1
+                    continue
                 sleep(delay)
+        self.counter = 0
 
     def call(self, address, name='', class_c='', id='', show_counter=0):
         self.driver.get(address)
@@ -54,8 +60,8 @@ class Bomber:
 
 
 def main():
-    target = Bomber("luccsdfat@gmail.com")
-    target.read_csv_file(show_counter=1)
+    target = Bomber("CowboyBebopopopo@protonmail.com")
+    target.read_csv_file()
     target.quit_driver()
 
 
