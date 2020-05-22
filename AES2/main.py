@@ -5,14 +5,16 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from secrets import token_bytes, choice, SystemRandom
-from os import path
+from os import path, listdir, chdir
+
 
 class Encrypt:
 
     test = None
 
     def main(self):
-        pass
+        key, salt = self.generate_key()
+        self.crypt_directory(r"C:\Users\leonw\PycharmProjects\Python_Projects\TESTDIR", key, salt, recursive_loop=True)
 
     @staticmethod
     def generate_key():
@@ -125,6 +127,43 @@ class Encrypt:
         finally:
             file.close()
 
+    def crypt_directory(self, directory_path, key, salt, recursive_loop=False):
+        # Check if directory exists
+        if not path.isdir(directory_path):
+            return -1
+
+        # Loop through files in directory
+        for file in listdir(directory_path):
+
+            # Not recursive
+            if not recursive_loop:
+
+                # Change working directory
+                chdir(directory_path)
+
+                if not path.isfile(file):
+                    continue
+
+                self.encrypt_file(file, key, salt)
+                continue
+
+            # Recursive
+            if recursive_loop:
+                # Change working directory
+                chdir(directory_path)
+
+                if path.isdir(file):
+                    # Call the function again
+                    self.crypt_directory(file, key, salt, recursive_loop=True)
+
+                if not path.isfile(file):
+                    continue
+
+                self.encrypt_file(file, key, salt)
+                continue
+
+
+
     @staticmethod
     def create_random_string_file(user_password, file_path="randomstring.txt", rewrite_file=True, size=1000000):
         if rewrite_file:
@@ -141,7 +180,6 @@ class Encrypt:
             i += 1
 
         Encrypt.test = random_string
-
 
         # Create Key
         salt = token_bytes(16)
@@ -195,8 +233,6 @@ class Encrypt:
             return -1
 
         return decrypted_data
-
-
 
 
 if __name__ == "__main__":

