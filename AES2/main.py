@@ -5,20 +5,98 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from secrets import token_bytes, choice, SystemRandom
-from os import path
+from os import path, listdir, chdir
+
 
 class Encrypt:
 
     test = None
 
     def main(self):
-        pass
+        path = "G:\Python_Projects\TESTDIR"
+        key, salt = self.generate_key()
+        #self.crypt_directory(path, key, salt, recursive_loop=True)
+
+        self.decrypt_directory(path, "hello", recursive_loop=True)
+
+
+    def crypt_directory(self, directory_path, key, salt, recursive_loop=False):
+        # Check if directory exists
+        if not path.isdir(directory_path):
+            return -1
+
+        # Change working directory
+        chdir(directory_path)
+
+        # Loop through files in directory
+        for file in listdir(directory_path):
+
+            # Not recursive
+            if not recursive_loop:
+
+                if not path.isfile(file):
+                    continue
+
+                self.encrypt_file(file, key, salt)
+                continue
+
+            # Recursive
+            if recursive_loop:
+                # Change working directory
+                chdir(directory_path)
+
+                if path.isdir(file):
+                    # Call the function again with the new directory
+                    self.crypt_directory(directory_path + "\\" + file, key, salt, recursive_loop=True)
+
+                if not path.isfile(file):
+                    continue
+
+                self.encrypt_file(file, key, salt)
+                continue
+        return 1
+
+    def decrypt_directory(self, directory_path, user_password, recursive_loop=False):
+        # Check if directory exists
+        if not path.isdir(directory_path):
+            return -1
+
+        # Change working directory
+        chdir(directory_path)
+
+        # Loop through files in directory
+        for file in listdir(directory_path):
+
+            # Not recursive
+            if not recursive_loop:
+
+                if not path.isfile(file):
+                    continue
+
+                self.decrypt_file(file, user_password)
+                continue
+
+            # Recursive
+            if recursive_loop:
+                # Change working directory
+                chdir(directory_path)
+
+                if path.isdir(file):
+                    # Call the function again with the new directory
+                    self.decrypt_directory(directory_path + "\\" + file, user_password, recursive_loop=True)
+
+                if not path.isfile(file):
+                    continue
+
+                self.decrypt_file(file, user_password)
+                continue
+        return 1
 
     @staticmethod
     def generate_key():
-        print("Enter password")
-        user_password = input("> ")
-
+        #print("Enter password")
+        #user_password = input("> ")
+        user_password = "hello"
         # Pepper the user password
         user_password += choice(string.ascii_letters)
         salt = token_bytes(16)
@@ -142,7 +220,6 @@ class Encrypt:
 
         Encrypt.test = random_string
 
-
         # Create Key
         salt = token_bytes(16)
         kdf = PBKDF2HMAC(algorithm=hashes.SHA3_256(), length=32, salt=salt, iterations=111355, backend=default_backend())
@@ -195,8 +272,6 @@ class Encrypt:
             return -1
 
         return decrypted_data
-
-
 
 
 if __name__ == "__main__":
