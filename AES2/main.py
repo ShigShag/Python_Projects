@@ -10,14 +10,8 @@ from os import path, listdir, chdir
 
 class Encrypt:
 
-    test = None
-
     def main(self):
-        path = "G:\Python_Projects\TESTDIR"
-        key, salt = self.generate_key()
-        #self.crypt_directory(path, key, salt, recursive_loop=True)
-
-        self.decrypt_directory(path, "hello", recursive_loop=True)
+        pass
 
 
     def crypt_directory(self, directory_path, key, salt, recursive_loop=False):
