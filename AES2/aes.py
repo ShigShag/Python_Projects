@@ -1,5 +1,4 @@
 import base64
-import string
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -8,21 +7,20 @@ from secrets import token_bytes, choice, SystemRandom
 from os import path, listdir, chdir
 from sys import argv, exit
 
+correct_key = None
+correct_salt = None
+
 class aes:
 
     @staticmethod
     def main():
         command = argv
+
         # If a command is given
         if len(command) > 1:
 
-            # If help is requested
-            if '-h' in command:
-                aes.print_stuff(help=True)
-
-
             # If encrypt and password command is given
-            elif '-e' in command and '-p' in command:
+            if '-e' in command and '-p' in command:
                 try:
                     # Generate Key and Salt
                     key, salt = aes.generate_key(command[command.index('-p') + 1])
@@ -33,6 +31,8 @@ class aes:
                             aes.print_stuff(success=True)
                         else:
                             aes.print_stuff(error=True)
+                    else:
+                        aes.print_stuff(success=True)
 
                 # If not enough arguments are given
                 except IndexError:
@@ -50,10 +50,16 @@ class aes:
                             aes.print_stuff(success=True)
                         else:
                             aes.print_stuff(error=True)
+                    else:
+                        aes.print_stuff(success=True)
 
                 # If not enough arguments are given
                 except IndexError:
                     aes.print_stuff(error=True)
+
+            # If help is requested
+            elif '-h' in command:
+                aes.print_stuff(help=True)
 
 
             # If no valid argument was given
@@ -194,9 +200,6 @@ class aes:
         finally:
             file.close()
 
-        # Add the keygen salt and data to one string
-        data = data
-
         # Encrypt data
         method = Fernet(key)
         data = method.encrypt(data)
@@ -254,7 +257,8 @@ class aes:
         data = data[20:20 + half_data_size] + data[40 + half_data_size:len(data) - 12]
 
         # Salt the user password
-        user_password += str(aes.get_random_string())
+        # Be sure to provide the absolute path to the string file because of the changed working directory
+        user_password += str(aes.get_random_string(file_path=r"G:\Python_Projects\AES2\randomstring.txt"))
 
         # Try to decrypt file for every pepper
         passed = False
