@@ -258,6 +258,7 @@ class aes:
 
         # Salt the user password
         # Be sure to provide the absolute path to the string file because of the changed working directory
+        # when encrypting directories
         user_password += str(aes.get_random_string(file_path=r"G:\Python_Projects\AES2\randomstring.txt"))
 
         # Try to decrypt file for every pepper
