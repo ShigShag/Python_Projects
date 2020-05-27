@@ -12,6 +12,8 @@ correct_salt = None
 
 class aes:
 
+    random_string = r"G:\Python_Projects\AES2\randomstring.txt"
+
     @staticmethod
     def main():
         command = argv
@@ -169,7 +171,7 @@ class aes:
     @staticmethod
     def generate_key(user_password):
         # Add salt to user_password
-        user_password += aes.get_random_string()
+        user_password += aes.get_random_string(file_path=aes.random_string)
 
         # Pepper the user password
         user_password += choice(['1', '2', '3'])
@@ -385,7 +387,6 @@ class aes:
             file.close()
 
         return data
-
 
 
 if __name__ == '__main__':
