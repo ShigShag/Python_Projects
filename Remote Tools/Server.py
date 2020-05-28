@@ -94,6 +94,8 @@ class Server:
                         for i in selection:
                             try:
                                 passed = self.send(self.clients[i - 1][0], cmd[5:])
+                                sleep(0.5)
+                                passed = self.receive(self.clients[i - 1][0])
 
                             # if client entry does not exists
                             except IndexError:
@@ -114,6 +116,24 @@ class Server:
             elif cmd == "exit":
                 return
 
+
+    def receive(self, client):
+        # Try to receive a message from given index
+        try:
+            size = client.recv(self.HEADER)
+        # If it fails
+        except(ConnectionAbortedError, ConnectionResetError, TimeoutError):
+            return 0
+
+        try:
+            msg = client.recv(int(size.decode()))
+        except ValueError:
+            print("Error reveived")
+            return 0
+
+        self.print_stuff(msg.decode())
+
+        return 1
 
     def listen(self):
         self.server.listen()
@@ -164,9 +184,13 @@ class Server:
         client.send(msg)
         sleep(4)
 
-    def print_stuff(self, clients=False, shell=False, syntax_error=False, selection_error=False):
+    def print_stuff(self,content=None, clients=False, shell=False, syntax_error=False, selection_error=False):
+        # Custom print
+        if content:
+            print(content)
+
         # Print all clients if clients ara available
-        if clients and len(self.clients) > 0:
+        elif clients and len(self.clients) > 0:
             i = 0
             print("INDEX\tHOSTNAME\t\t\t\t\t\t\tADDRESS\t\t\tPORT")
             for client in self.clients:
