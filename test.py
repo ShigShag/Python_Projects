@@ -1,2 +1,3 @@
-s = "send hello"
-print(s[6:])
+import win32com.client as win32
+
+win32.

