@@ -1,6 +1,7 @@
 import socket
 import threading
 from time import sleep
+from sys import exit
 class Server:
 
     clients = []
@@ -22,6 +23,7 @@ class Server:
         self.server.settimeout(None)
 
     def main(self):
+
         # Create listening thread
         listening_thread = threading.Thread(target=self.listen)
 
@@ -109,23 +111,8 @@ class Server:
                 else:
                     self.print_stuff(syntax_error=True)
 
-
-
-
-
-
-
-
-
-            elif cmd == "test":
-                print(selection)
-
-
-
-
-
-
-
+            elif cmd == "exit":
+                return
 
 
     def listen(self):
@@ -181,9 +168,9 @@ class Server:
         # Print all clients if clients ara available
         if clients and len(self.clients) > 0:
             i = 0
-            print("INDEX\tADDRESS\t\t\tPORT")
+            print("INDEX\tHOSTNAME\t\t\t\t\t\t\tADDRESS\t\t\tPORT")
             for client in self.clients:
-                print(f"[{i + 1}] \t{client[1][0]}\t{client[1][1]}")
+                print(f"[{i + 1}] \t{socket.gethostbyaddr(client[1][0])[0]}\t\t\t{client[1][0]}\t{client[1][1]}")
                 i += 1
 
         elif shell:
@@ -198,41 +185,5 @@ class Server:
 #gethostbyaddr
 
 
-
-
-
-
-
 s = Server(socket.gethostbyname(socket.gethostname()), 5050, 64)
-s.main()
-"""
-def handle_client(conn, addr):
-    print("NEW CONNECTION{} connected".format(addr))
-
-    connected = True
-    while connected:
-        msg_length = conn.recv(HEADER).decode(FORMAT)
-        if msg_length:
-            msg_length = int(msg_length)
-            msg = conn.recv(msg_length).decode(FORMAT)
-
-            if msg == DISCONNECT_MESSAGE:
-                connected = False
-            print(f"[{addr}] {msg}")
-            conn.send("Msg received".encode(FORMAT))
-    conn.close()
-
-def start():
-    server.listen()
-    print(f"[LISTENING] Server is listening on {IP}")
-    while True:
-        conn, addr = server.accept()
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
-        thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
-
-print("Starting Server")
-start()
-
-
-"""
+exit(s.main())

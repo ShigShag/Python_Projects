@@ -1,5 +1,6 @@
 import socket
 from os import system
+from time import sleep
 
 HEADER = 64
 ADDR = socket.gethostbyname(socket.gethostname())
@@ -10,9 +11,15 @@ FORMAT = "utf-8"
 class client:
 
     def __init__(self, ip, port, header):
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.connect((ip, port))
-        self.header = header
+        while True:
+            try:
+                self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.server.connect((ip, port))
+                self.header = header
+                break
+            except:
+                sleep(2)
+                continue
 
     def main(self):
         while True:
