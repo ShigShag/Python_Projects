@@ -20,6 +20,7 @@ class Socket:
             print("Listening...")
             self.socket.listen(1)
             self.connection, self.address = self.socket.accept()
+            self.connection.getsockname()
             self.established = True
             print(f"Connection established with {self.address}")
         except socket.timeout:

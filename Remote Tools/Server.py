@@ -94,7 +94,7 @@ class Server:
                         for i in selection:
                             try:
                                 passed = self.send(self.clients[i - 1][0], cmd[5:])
-                                sleep(0.5)
+                                sleep(1)
                                 passed = self.receive(self.clients[i - 1][0])
 
                             # if client entry does not exists
@@ -120,9 +120,11 @@ class Server:
     def receive(self, client):
         # Try to receive a message from given index
         try:
+            client.settimeout(15.0)
             size = client.recv(self.HEADER)
         # If it fails
-        except(ConnectionAbortedError, ConnectionResetError, TimeoutError):
+        except(ConnectionAbortedError, ConnectionResetError, TimeoutError, socket.timeout):
+            print(f"Timeout while receiving feedback from client: {client.getsockname()}")
             return 0
 
         try:
@@ -175,15 +177,6 @@ class Server:
 
         return 1
 
-    def handle_client(self, client, address):
-        msg = str(f"Welcome to the Server. Your IP {address[0]}, Your PORT {address[1]}").encode()
-        size = len(msg)
-        msg_len = str(size).encode()
-        msg_len += b' ' * (self.HEADER - len(msg_len))
-        client.send(msg_len)
-        client.send(msg)
-        sleep(4)
-
     def print_stuff(self,content=None, clients=False, shell=False, syntax_error=False, selection_error=False):
         # Custom print
         if content:
@@ -205,8 +198,6 @@ class Server:
 
         elif selection_error:
             print("No clients selected")
-
-#gethostbyaddr
 
 
 s = Server(socket.gethostbyname(socket.gethostname()), 5050, 64)
