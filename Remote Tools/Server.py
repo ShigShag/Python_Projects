@@ -7,6 +7,12 @@ class Server:
     clients = []
 
     def __init__(self, ip, port, header):
+
+        # Create and bind server to Address
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.bind((ip, port))
+        self.server.settimeout(None)
+
         # Header size for marking the length of messages
         self.HEADER = header
 
@@ -17,10 +23,10 @@ class Server:
         self.ip = ip
         self.port = port
 
-        # Create and bind server to Address
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind((ip, port))
-        self.server.settimeout(None)
+        # List for client selection
+        self.selection = []
+
+
 
     def main(self):
 
@@ -40,7 +46,6 @@ class Server:
 
 
         # Main loop
-        selection = []
         while True:
             cmd = input(">>> ")
 
@@ -48,6 +53,7 @@ class Server:
             if cmd == "list" or cmd == "client" or cmd == "clients":
                 self.check_client()
                 self.print_stuff(clients=True)
+                self.print_stuff(selected_clients=True)
 
             elif "select" in cmd and cmd != "select":
                 temp = cmd.split(" ")
@@ -56,7 +62,7 @@ class Server:
                 if len(temp) > 1:
 
                     # Delete all old selections
-                    del selection[:]
+                    del self.selection[:]
 
                     # check clients
                     self.check_client()
@@ -67,7 +73,7 @@ class Server:
 
                             # If entry is an index of an existing client
                             if 0 <= int(entry) < len(self.clients) + 1:
-                                selection.append(int(entry))
+                                self.selection.append(int(entry))
 
                         # Filter out fake integer values
                         except ValueError:
@@ -83,7 +89,7 @@ class Server:
                 if len(cmd) > 5:
 
                     # If clients are selected
-                    if len(selection) >= 1:
+                    if len(self.selection) >= 1:
 
                         # check for clients
                         self.check_client()
@@ -91,7 +97,7 @@ class Server:
                         # passed variable to check if a send failed
                         passed = 0
 
-                        for i in selection:
+                        for i in self.selection:
                             try:
                                 passed = self.send(self.clients[i - 1][0], cmd[5:])
                                 sleep(1)
@@ -101,7 +107,7 @@ class Server:
                             except IndexError:
                                 continue
 
-                        # If a message send was not successful check clients again
+                        # If a message send or receive was not successful check clients again
                         if not passed:
                             self.check_client()
 
@@ -112,6 +118,9 @@ class Server:
                 # If no arguments were given
                 else:
                     self.print_stuff(syntax_error=True)
+
+            elif cmd == "helo":
+                pass # TODO
 
             elif cmd == "exit":
                 return
@@ -130,7 +139,7 @@ class Server:
         try:
             msg = client.recv(int(size.decode()))
         except ValueError:
-            print("Error reveived")
+            print("Error received")
             return 0
 
         self.print_stuff(msg.decode())
@@ -177,7 +186,7 @@ class Server:
 
         return 1
 
-    def print_stuff(self,content=None, clients=False, shell=False, syntax_error=False, selection_error=False):
+    def print_stuff(self,content=None, clients=False, selected_clients=False, shell=False, syntax_error=False, selection_error=False):
         # Custom print
         if content:
             print(content)
@@ -189,6 +198,13 @@ class Server:
             for client in self.clients:
                 print(f"[{i + 1}] \t{socket.gethostbyaddr(client[1][0])[0]}\t\t\t{client[1][0]}\t{client[1][1]}")
                 i += 1
+
+        elif selected_clients:
+            if len(self.selection) > 0:
+                print("Selected clients:")
+                print(self.selection)
+            else:
+                print("No clients selected")
 
         elif shell:
             print("\n[SHELL STARTED]")
