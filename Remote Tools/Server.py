@@ -119,7 +119,13 @@ class Server:
                 else:
                     self.print_stuff(syntax_error=True)
 
-            elif cmd == "helo":
+            # If you want to browse files for one client
+            elif cmd == "walk" and len(self.selection) == 1:
+                i = self.selection[0] - 1
+                print(f"NOW WALKING CLIENT: {socket.gethostbyaddr(self.clients[i][1][0])[0]}\t{self.clients[i][1][0]}:{self.clients[i][1][1]}")
+
+
+            elif cmd == "help":
                 pass # TODO
 
             elif cmd == "exit":
@@ -181,7 +187,7 @@ class Server:
             connection.send(msg.encode())
 
         # If sending fails
-        except ConnectionResetError:
+        except (ConnectionResetError, ConnectionAbortedError):
             return 0
 
         return 1
