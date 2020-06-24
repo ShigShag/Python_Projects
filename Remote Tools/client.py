@@ -64,6 +64,10 @@ class client:
         if not passed:
             return 0
 
+        else:
+            while True:
+                passed = self.receive()
+
     def run_command(self, cmd):
         try:
             output = subprocess.check_output(cmd, shell=True)

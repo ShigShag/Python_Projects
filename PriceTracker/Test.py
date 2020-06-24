@@ -9,7 +9,6 @@ def main():
 
         # Skip description line
         next(data)
-        next(data)
 
         for entry in data:
             show(entry[0], entry[1])

