@@ -1,6 +1,4 @@
-with open("PriceTracker/radon_logo_2019_black.jpg", "rb")as f:
-    c = f.read()
+a = [2, 3 , 4, 1]
 
-
-with open("PriceTracker/radon_logo.ico", "wb")as f:
-    f.write(c)
+a.sort()
+print(a)
