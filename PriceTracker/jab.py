@@ -45,8 +45,6 @@ if not sold_out:
 
     toaster.show_toast("RADON JAB 10.0 HD NOT SOLD OUT ANYMORE", price.contents[0], icon_path=icon, duration=duration)
 
-
-
 # JAB 10.0 HD SOLD OUT TRACKER
 
 

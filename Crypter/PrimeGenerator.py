@@ -26,13 +26,12 @@ def miller_rabin(p):
 
 def prime_number():
     # 4 is no prime
-    p = 79
-    #while not miller_rabin(p):
-        #p = pot_prime()
-    t = 1
+    p = 4
+    while not miller_rabin(p):
+        p = pot_prime()
+    t = 120
     while t != 0:
         if miller_rabin(p):
-            print("TRUE")
             t -= 1
         else:
             prime_number()
@@ -40,7 +39,7 @@ def prime_number():
 
 
 def pot_prime():
-    p = secrets.randbits(1000)
+    p = secrets.randbits(20)
     return p
 
 
