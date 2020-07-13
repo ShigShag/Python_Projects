@@ -1,4 +1,5 @@
 import secrets
+import time
 from random import randrange
 
 
@@ -27,22 +28,24 @@ def miller_rabin(p):
 def prime_number():
     # 4 is no prime
     p = 4
+    bits = 2000
     while not miller_rabin(p):
-        p = pot_prime()
-    t = 120
+        p = pot_prime(bits)
+    t = 10
     while t != 0:
         if miller_rabin(p):
             t -= 1
         else:
             prime_number()
-    print(p)
+    with open("Rabin_Miller.txt", "a+")as f:
+        f.write(f"{p}\n")
+    prime_number()
 
-
-def pot_prime():
-    p = secrets.randbits(20)
+def pot_prime(size):
+    p = secrets.randbits(size)
     return p
 
-
 prime_number()
+
 
 

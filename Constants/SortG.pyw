@@ -4,7 +4,7 @@ from sys import exit
 
 
 def main():
-    destination_folder = "G:/"
+    destination_folder = "F:/"
     os.chdir(destination_folder)
     cpp_name = "C++ PROJECTS"
     c_name = "C PROJECTS"
@@ -14,14 +14,16 @@ def main():
 
 def move_directories(origin_path, cpp_path, c_path):
     for name in os.listdir(origin_path):
-        for files in os.listdir(name):
-            if files.endswith(".c"):
-                shutil.move(name, c_path)
-                break
-            elif files.endswith(".cpp"):
-                shutil.move(name, cpp_path)
-                break
-
+        try:
+            for files in os.listdir(name):
+                if files.endswith(".c"):
+                    shutil.move(name, c_path)
+                    break
+                elif files.endswith(".cpp"):
+                    shutil.move(name, cpp_path)
+                    break
+        except PermissionError:
+            continue
 
 def create_save_folders(name_cpp, name_c):
     try:

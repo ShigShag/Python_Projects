@@ -1,6 +1,5 @@
 from sys import argv, exit
-
-path = "G:\Python_Projects\Erinnerung\stats.txt"
+path = "F:\Python_Projects\Erinnerung\stats.txt"
 try:
     argv[1]
 except IndexError:
