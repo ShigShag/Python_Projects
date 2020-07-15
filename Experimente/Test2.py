@@ -1,6 +1,4 @@
-import pickle
 from time import time
-
 def prime_list(top):
     r = [2]
     start = time()
@@ -15,8 +13,3 @@ def prime_list(top):
     end = time()
     return r, end - start
 
-a, t = prime_list(10000)
-
-f = open("F:\Python_Projects\Experimente\primes.txt", "wb")
-f.write(pickle.dumps(a))
-f.close()

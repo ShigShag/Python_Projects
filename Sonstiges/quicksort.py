@@ -31,16 +31,15 @@ def quick_sort(array, l, r):
 
 a = []
 
-for i in range(0, 20000000 +1):
+for i in range(0, 200000 + 1):
     a.append(random.randrange(0, 30000))
 
-b = a
 
 
 
 start = time.time()
-b.sort()
+quick_sort(a, 0, 200000)
 end = time.time()
-print("Time to sort with normal sort: " + str(end - start) + " Seconds")
+print(end - start)
 
 
