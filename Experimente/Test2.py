@@ -1,4 +1,5 @@
 from time import time
+
 def prime_list(top):
     r = [2]
     start = time()
@@ -13,3 +14,6 @@ def prime_list(top):
     end = time()
     return r, end - start
 
+a, t = prime_list(1000000)
+
+print(t)

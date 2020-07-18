@@ -17,6 +17,4 @@ def prime_list(top):
 
 a, t = prime_list(10000)
 
-f = open("F:\Python_Projects\Experimente\primes.txt", "wb")
-f.write(pickle.dumps(a))
-f.close()
+print(t)
