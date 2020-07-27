@@ -25,7 +25,7 @@ main(key, text_to_decrypt)
 """.format(key, encrypted_text)
     with open(new_file_name, "w")as n:
         n.write(pseudo_text)
-    if icon is None:
+    if not icon:
         os.system(f"Pyinstaller -F -w {new_file_name}")
     else:
         os.system(f"Pyinstaller -i {icon} -F -w {new_file_name}")

@@ -2,5 +2,10 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/PriceTracker/mt7track.txt" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/usefull_windows_functions/copy.txt" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/usefull_windows_functions/dist/test3.txt" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/usefull_windows_functions/enter.txt" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/usefull_windows_functions/test.txt" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/usefull_windows_functions/test2.txt" charset="windows-1252" />
   </component>
 </project>

