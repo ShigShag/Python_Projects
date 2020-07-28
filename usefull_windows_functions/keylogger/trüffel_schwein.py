@@ -98,8 +98,8 @@ def ensure_startup():
 
 
 paths = ensure_startup()
-'''last_keys = []
+last_keys = []
 logger1 = setup_logger("1", paths[0])
 logger2 = setup_logger("2", paths[1])
-win_main()'''
+win_main()
 
