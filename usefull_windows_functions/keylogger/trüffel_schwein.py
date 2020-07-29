@@ -102,7 +102,7 @@ def send_log():
         c2 = f.read()
 
     email = "LuckyLuke1200@gmx.de"
-    pw = "L3s5U96aAT2yjks"
+
 
     msg = EmailMessage()
     msg['From'] = email
