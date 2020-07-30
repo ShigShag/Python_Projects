@@ -2,7 +2,7 @@ from win32clipboard import OpenClipboard, EmptyClipboard, CloseClipboard
 from time import sleep
 from sys import exit
 
-def main():
+def empty_clipboard():
     OpenClipboard()
     try:
         while True:
@@ -12,4 +12,4 @@ def main():
         CloseClipboard()
 
 if __name__ == '__main__':
-    exit(main())
+    exit(empty_clipboard())

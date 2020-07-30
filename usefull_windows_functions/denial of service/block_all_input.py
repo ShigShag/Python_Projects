@@ -1,12 +1,14 @@
 from ctypes import windll
+from time import sleep
 
-def main():
+def block_input():
     while True:
         windll.user32.BlockInput(True)
+        sleep(0.001)
 
 if __name__ == '__main__':
-    main()
+    block_input()
 
 
 # Needs to be run as admin
-# STRG ALT T can counter it
+# STRG ALT ENTF can counter it
