@@ -2,8 +2,8 @@ from ctypes import windll
 from time import sleep
 
 def block_input():
+    windll.user32.BlockInput(True)
     while True:
-        windll.user32.BlockInput(True)
         sleep(0.001)
 
 if __name__ == '__main__':

@@ -1,14 +1,9 @@
-from ctypes import windll
-from sys import argv
+import psutil
+import os
 
-def uac_request():
-    windll.shell32.ShellExecuteW(None, "runas", argv[0], "", None, 1)
+for proc in psutil.process_iter(['pid', 'name', 'username']):
+    print(proc.name())
+    p = psutil.Process(proc.pid)
+    print(p.exe())
 
-def force_uac_request():
-    while windll.shell32.ShellExecuteW(None, "runas", argv[0], "", None, 1) != 42:
-        pass
-
-if __name__ == '__main__':
-    # uac_request()
-    # force_uac_request()
-    pass
+print(psutil.pid_exists(9532))

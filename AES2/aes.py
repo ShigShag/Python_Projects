@@ -12,7 +12,7 @@ correct_salt = None
 
 class aes:
 
-    random_string = r"G:\Python_Projects\AES2\randomstring.txt"
+    random_string = r"F:\Python_Projects\AES2\randomstring.txt"
 
     @staticmethod
     def main():
@@ -80,7 +80,7 @@ class aes:
                   "-e = encrypt\n"
                   "-d = decrypt\n"
                   "-p = password\n"
-                  "-r = recursive encryption for directories. Is ignored if file is given\n\n"
+                  "-r = recursive encryption for directories. Is ignored if file is given.\n\n"
                   "General:\n"
                   "- Syntax is not important as long as all necessary commands are followed by arguments.\n"
                   "- AES uses cbc method provided by pythons 'encryption' library.\n"
@@ -261,7 +261,7 @@ class aes:
         # Salt the user password
         # Be sure to provide the absolute path to the string file because of the changed working directory
         # when encrypting directories
-        user_password += str(aes.get_random_string(file_path=r"G:\Python_Projects\AES2\randomstring.txt"))
+        user_password += str(aes.get_random_string(file_path=aes.random_string))
 
         # Try to decrypt file for every pepper
         passed = False

