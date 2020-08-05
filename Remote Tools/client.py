@@ -4,7 +4,7 @@ import os
 from time import sleep
 
 HEADER = 64
-ADDR = socket.gethostbyname(socket.gethostname())
+ADDR = "192.168.43.13"
 PORT = 5050
 FORMAT = "utf-8"
 

@@ -2,6 +2,8 @@ import socket
 import threading
 from time import sleep
 from sys import exit
+
+
 class Server:
 
     clients = []
@@ -25,8 +27,6 @@ class Server:
 
         # List for client selection
         self.selection = []
-
-
 
     def main(self):
 
@@ -225,5 +225,5 @@ class Server:
             print("No clients selected")
 
 
-s = Server(socket.gethostbyname(socket.gethostname()), 5050, 64)
+s = Server("192.168.43.13", 5050, 64)
 exit(s.main())

