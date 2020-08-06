@@ -237,13 +237,13 @@ def receive():
     return msg.decode()
 
 def send(msg):
-    if msg is None or msg == "" or msg == " ":
+    if msg is None or msg == "":
         return
 
     msg_len = str(len(msg)).encode()
     msg_len += b' ' *(BUFF_SIZE - len(msg_len))
     SERVER.send(msg_len)
-    sleep(0.1)
+    sleep(0.5)
     SERVER.send(msg.encode())
 
 def create_clipboard_thread():
