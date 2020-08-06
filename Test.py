@@ -1,5 +1,9 @@
-import os
-from time import sleep
-while True:
-    os.system("taskkill /F /IM Taskmgr.exe")
-    sleep(1)
+a = 3
+
+if a == 2:
+    pass
+elif a == 3:
+    print("yes")
+
+else:
+    print("no")

