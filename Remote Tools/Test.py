@@ -1,10 +1,6 @@
-#from time import sleep
+import sys
+import os
 
-exec("""
-from time import sleep
-sleep(4)
-
-
-""")
-
-print("Finish")
+print(sys.argv[0])
+print(os.path.realpath(sys.argv[0]))
+input()

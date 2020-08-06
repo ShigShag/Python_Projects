@@ -47,7 +47,6 @@ class Server:
 
         # Main loop
         while True:
-            sleep(1.3)
             cmd = input(">>> ")
 
             # If client list is requested
@@ -93,7 +92,8 @@ class Server:
                     if len(self.selection) >= 1:
 
                         # check for clients
-                        self.check_client()
+                        # TODO
+                        # self.check_client()
 
                         # passed variable to check if a send failed
                         passed = False
